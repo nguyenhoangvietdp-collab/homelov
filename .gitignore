@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+wrapped.html
+template3.html
+ws_*.npy
+*.png
+!vinh-xanh/build/**/*.png

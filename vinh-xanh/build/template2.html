@@ -1,0 +1,340 @@
+<title>Sơ đồ Vịnh Xanh</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: full-screen site plan; header with legend, map canvas, lot card docked right on desktop and as a bottom sheet on phones */
+:root{
+  --bg:#f2f8f7; --surface:#ffffff; --fg:#0c2a29; --muted:#55716e; --line:#d6e5e2;
+  --accent:#00a094; --accent-ink:#ffffff; --accent-2:#ff6a3d; --focus:#ff6a3d;
+  --hero-a:#00a99d; --hero-b:#1d9bd6; --hero-ink:#ffffff;
+  --land:#e9efe6; --label-halo:rgba(8,40,38,.82); --label-ink:#ffffff; --lotline:#ffffff;
+  --t-sl:#34d27b; --t-xk:#ffd21f; --t-dl:#ff7a4f; --t-sh:#c065ff;
+  --font-ui:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --font-data:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --shadow:0 12px 32px rgba(10,60,58,.18);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0d1a1a; --surface:#142625; --fg:#e6f2f0; --muted:#94b0ac; --line:#284442;
+  --accent:#2fd0c2; --accent-ink:#04201d; --accent-2:#ff8a63; --focus:#ffb03b;
+  --hero-a:#007f77; --hero-b:#14699a; --hero-ink:#ffffff;
+  --land:#13201f; --label-halo:rgba(4,20,19,.85); --label-ink:#ffffff; --lotline:#ffffff;
+  --t-sl:#34d27b; --t-xk:#ffd21f; --t-dl:#ff7a4f; --t-sh:#c065ff;
+  --shadow:0 12px 32px rgba(0,0,0,.5); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0d1a1a; --surface:#142625; --fg:#e6f2f0; --muted:#94b0ac; --line:#284442;
+  --accent:#2fd0c2; --accent-ink:#04201d; --accent-2:#ff8a63; --focus:#ffb03b;
+  --hero-a:#007f77; --hero-b:#14699a; --hero-ink:#ffffff;
+  --land:#13201f; --label-halo:rgba(4,20,19,.85); --label-ink:#ffffff; --lotline:#ffffff;
+  --t-sl:#34d27b; --t-xk:#ffd21f; --t-dl:#ff7a4f; --t-sh:#c065ff;
+  --shadow:0 12px 32px rgba(0,0,0,.5); color-scheme:dark}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-ui);font-size:14px;line-height:1.45;margin:0;overflow:hidden}
+.app{height:100%;display:grid;grid-template-rows:auto minmax(0,1fr);grid-template-columns:minmax(0,1fr) 360px}
+header{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;padding:12px 16px;background:linear-gradient(100deg,var(--hero-a),var(--hero-b));color:var(--hero-ink)}
+.brand{display:flex;flex-direction:column;min-width:0}
+.brand small{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--hero-ink);opacity:.85;font-weight:600}
+.brand h1{margin:0;font-size:20px;font-weight:700;letter-spacing:-.01em;text-wrap:balance}
+.legend{display:flex;flex-wrap:wrap;gap:6px;margin-left:auto}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;border:0;background:var(--surface);color:var(--fg);font:600 12.5px var(--font-ui);cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.12)}
+.chip i{width:12px;height:12px;border-radius:4px;display:inline-block;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+.chip[aria-pressed="false"]{opacity:.45}
+.chip.sale{background:var(--accent-2);color:#fff}
+.chip.sale[aria-pressed="false"]{opacity:1}
+.chip.sale[aria-pressed="true"]{background:var(--surface);color:var(--accent-2);outline:2px solid var(--accent-2)}
+.search{display:flex;gap:6px}
+.search input{width:130px;padding:7px 12px;border:0;border-radius:999px;background:var(--surface);color:var(--fg);font:500 13px var(--font-data);text-transform:uppercase}
+.search input::placeholder{text-transform:none;font-family:var(--font-ui);color:var(--muted)}
+button:focus-visible,input:focus-visible,.lot:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.mapwrap{position:relative;min-width:0;min-height:0;overflow:hidden;background:var(--land)}
+svg#map{width:100%;height:100%;display:block;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
+svg#map.dragging{cursor:grabbing}
+.lot{stroke:var(--lotline);stroke-width:.6;cursor:pointer;transition:opacity .2s;fill-opacity:.94}
+.lot:hover{stroke:var(--fg);stroke-width:.9}
+.lot.dim{opacity:.12}
+.lot.sel{stroke:var(--focus);stroke-width:2.2;paint-order:stroke}
+.feat{stroke:#ffffff;stroke-width:1.4}
+.glow{fill:none;stroke:var(--accent-2);stroke-width:3;opacity:.9;pointer-events:none;animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{50%{stroke-width:6;opacity:.35}}
+.co{cursor:pointer;transition:opacity .2s}
+.pin{cursor:pointer;transition:opacity .2s}.pin rect{fill:var(--accent-2);stroke:#fff;stroke-width:1.2}.pin text{fill:#fff;font:700 8px var(--font-data)}
+svg#map:not(.compact) .pin,svg#map.compact .co,svg#map.compact .leader{display:none}
+.off,svg#map.zoomed .co,svg#map.zoomed .leader{opacity:0;pointer-events:none}
+svg#map.zoomed .glow.off{opacity:0}
+.co .bx{fill:var(--surface);stroke:var(--line);stroke-width:.6}
+.co .hd{fill:var(--accent-2)}
+.co .ct{fill:#ffffff;font:700 12px var(--font-ui);letter-spacing:.02em}
+.co .ty{fill:#ffffff;font:500 8px var(--font-ui);opacity:.95}
+.co .k{fill:var(--muted);font:500 8px var(--font-ui)}
+.co .v{fill:var(--fg);font:600 8.5px var(--font-ui)}
+.co .pr{fill:var(--accent);font:700 12px var(--font-data)}
+.co:hover .bx{stroke:var(--accent-2);stroke-width:1.2}
+.leader{stroke:#ffffff;stroke-width:1.2;fill:none;pointer-events:none;stroke-dasharray:3 2}
+.dot{fill:var(--accent-2);stroke:#fff;stroke-width:1.2;pointer-events:none}
+.street{fill:none;stroke:var(--road);stroke-linecap:round;stroke-linejoin:round}
+.slabel{fill:var(--label-ink);stroke:var(--label-halo);stroke-width:2.2px;paint-order:stroke;stroke-linejoin:round;font:600 6.4px var(--font-ui);letter-spacing:.06em;pointer-events:none;text-transform:uppercase}
+.blabel{fill:var(--label-ink);stroke:var(--label-halo);stroke-width:2.6px;paint-order:stroke;stroke-linejoin:round;font:700 8.5px var(--font-ui);letter-spacing:.12em;pointer-events:none;text-transform:uppercase}
+.area-label{fill:var(--label-ink);stroke:var(--label-halo);stroke-width:3px;paint-order:stroke;stroke-linejoin:round;font:700 11px var(--font-ui);letter-spacing:.14em;text-transform:uppercase;pointer-events:none}
+.photo{border-radius:12px;overflow:hidden;border:1px solid var(--line);position:relative;aspect-ratio:16/9;max-width:100%;background:var(--land)}
+.photo svg{width:100%;height:100%;display:block}
+.photo span{position:absolute;left:8px;bottom:8px;background:rgba(0,0,0,.55);color:#fff;font-size:11px;padding:2px 8px;border-radius:999px}
+.ctrl{position:absolute;right:12px;top:12px;display:flex;flex-direction:column;gap:6px}
+.ctrl button{width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);font:600 18px var(--font-ui);cursor:pointer;box-shadow:var(--shadow)}
+.hint{position:absolute;left:12px;bottom:12px;background:var(--surface);color:var(--muted);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:12px;max-width:calc(100% - 24px)}
+aside{border-left:1px solid var(--line);background:var(--surface);overflow-y:auto;min-width:0;display:flex;flex-direction:column}
+.panel{padding:18px 18px 8px;display:flex;flex-direction:column;gap:14px}
+.eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.card-h{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.card-h h2{margin:2px 0 0;font-size:22px;letter-spacing:-.01em}
+.code{font-family:var(--font-data);font-weight:500}
+.tag{display:inline-block;padding:3px 8px;border-radius:6px;font-size:12px;font-weight:600;color:#1d2a29}
+.badges{display:flex;flex-wrap:wrap;gap:6px}
+.badge{font-size:12px;padding:3px 8px;border-radius:999px;background:var(--bg);border:1px solid var(--line);color:var(--fg)}
+dl.spec{margin:0;display:grid;grid-template-columns:auto 1fr;border-top:1px solid var(--line)}
+dl.spec dt,dl.spec dd{padding:8px 0;border-bottom:1px solid var(--line);margin:0}
+dl.spec dt{color:var(--muted);padding-right:14px;font-size:13px}
+dl.spec dd{text-align:right;font-weight:600;font-variant-numeric:tabular-nums;min-width:0}
+.price{display:grid;grid-template-columns:1fr auto;gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.price div{padding:8px 12px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+.price div:nth-last-child(-n+2){border-bottom:0}
+.price .v{text-align:right;font-family:var(--font-data);font-weight:500}
+.price .total{background:linear-gradient(100deg,var(--hero-a),var(--hero-b));color:#fff;font-weight:600}
+.note{font-size:12px;color:var(--muted)}
+.close{border:1px solid var(--line);background:var(--bg);color:var(--fg);border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:16px;flex:none}
+.flist{display:flex;flex-direction:column;gap:8px}
+.fitem{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--fg);text-align:left;cursor:pointer;font:inherit}
+.fitem:hover{border-color:var(--accent)}
+.fitem .code{font-size:15px}
+.fitem small{display:block;color:var(--muted);font-size:12px}
+.fitem .p{font-family:var(--font-data);font-weight:500;text-align:right;font-variant-numeric:tabular-nums}
+.foot{margin-top:auto;padding:12px 18px 18px;font-size:11.5px;color:var(--muted);border-top:1px solid var(--line)}
+@media (max-width:820px){
+  .app{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)}
+  header{padding:10px 16px;gap:8px}
+  .brand h1{font-size:17px}
+  .legend{margin-left:0;width:100%;min-width:0;overflow-x:auto;flex-wrap:nowrap;padding-bottom:2px;scrollbar-width:none}
+  .chip{flex:none}
+  .search{position:absolute;right:16px;top:12px}
+  .search input{width:112px;padding:7px 10px}
+  aside{position:fixed;left:0;right:0;bottom:0;max-height:58%;border-left:0;border-top:1px solid var(--line);border-radius:16px 16px 0 0;box-shadow:var(--shadow);padding-bottom:env(safe-area-inset-bottom,0px);transition:transform .25s ease}
+  aside.collapsed{transform:translateY(calc(100% - 52px))}
+  .grab{display:block!important}
+  .hint{display:none}
+  .ctrl{top:auto;bottom:calc(52px + 12px)}
+}
+.grab{display:none;width:100%;border:0;background:transparent;padding:8px 0 0;cursor:pointer;color:var(--muted);font:600 12px var(--font-ui)}
+.grab span{display:block;width:40px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 4px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="app">
+  <header>
+    <div class="brand"><small>Ocean Park 3 · Ocean City</small><h1>Phân khu Vịnh Xanh</h1></div>
+    <div class="legend" id="legend" role="group" aria-label="Lọc theo loại hình"></div>
+    <form class="search" id="searchForm" role="search">
+      <input id="q" type="search" placeholder="Mã căn" aria-label="Tìm mã căn" autocomplete="off">
+    </form>
+  </header>
+  <div class="mapwrap" id="wrap">
+    <svg id="map" viewBox="60 110 1120 720" aria-label="Sơ đồ mặt bằng phân khu Vịnh Xanh"></svg>
+    <div class="ctrl">
+      <button id="zin" aria-label="Phóng to">+</button>
+      <button id="zout" aria-label="Thu nhỏ">−</button>
+      <button id="zfit" aria-label="Xem toàn khu" style="font-size:13px">⤢</button>
+    </div>
+    <div class="hint">Kéo để di chuyển, cuộn hoặc chụm hai ngón để phóng to. Chạm vào một lô để xem thông tin.</div>
+  </div>
+  <aside id="aside">
+    <button class="grab" id="grab" aria-label="Mở hoặc thu gọn thông tin"><span></span><b id="grabTxt">Thông tin căn</b></button>
+    <div class="panel" id="panel"></div>
+    <div class="foot">Sơ đồ minh họa vẽ lại từ mặt bằng phân khu Vịnh Xanh, không theo tỉ lệ. Vị trí, số lượng lô và hướng chỉ mang tính tham khảo. Giá theo bảng hàng ngày 03/09/2026, là giá tạm tính và có thể thay đổi. Thông tin chính thức theo hợp đồng và hồ sơ của chủ đầu tư. Tài liệu do chuyên viên tư vấn biên soạn.</div>
+  </aside>
+</div>
+
+<script>
+const LOTS=__LOTS__;
+const TYPES={
+  song_lap:{name:'Biệt thự song lập Harmony Villas',short:'Song lập',v:'--t-sl',size:'8 × 18 m (điển hình)'},
+  xe_khe:{name:'Liền kề xẻ khe',short:'Xẻ khe',v:'--t-xk',size:'7 × 18 m (điển hình)'},
+  don_lap:{name:'Biệt thự đơn lập Riviera Villas',short:'Đơn lập',v:'--t-dl',size:'Theo từng lô'},
+  shophouse:{name:'Shophouse mặt đại lộ',short:'Shophouse',v:'--t-sh',size:'Theo từng lô'}
+};
+const SPEC={
+  don_lap:{n:'115',land:'180 – 417,6 m²',dens:'35 – 45%',fl:'4 tầng + tum',price:'25 – 60 tỷ'},
+  song_lap:{n:'278',land:'126 – 251,1 m²',dens:'50 – 55%',fl:'4 tầng + tum',price:'15 – 30 tỷ'},
+  lien_ke:{n:'169',land:'90 – 144 m²',dens:'75 – 85%',fl:'5 tầng',price:'13 – 18 tỷ'},
+  shophouse:{n:'185',land:'84 – 229,4 m²',dens:'75 – 80%',fl:'5 tầng',price:'15 – 40 tỷ'}};
+const DN={'B':'Bắc','ĐB':'Đông Bắc','Đ':'Đông','ĐN':'Đông Nam','N':'Nam','TN':'Tây Nam','T':'Tây','TB':'Tây Bắc'};
+const GIFT='1 voucher Vinmec, 1 voucher Aquafield, phí dịch vụ 2 năm';
+const SALE={
+ 'VX2-19':{type:'xe_khe',dir:'Tây Bắc',size:'7 × 18 m',land:126,build:340.4,total:18205977986,tts:14.900,h18:16.947,h24:17.767,h30:18.587,h36:19.498,gift:GIFT,bank:'VPBank'},
+ 'VX3-52':{type:'song_lap',dir:'Đông Nam',size:'8 × 18 m',land:144,build:294.5,total:20473235785,tts:16.989,h18:19.321,h24:20.243,h30:21.165,h36:22.189,gift:GIFT,bank:'VPBank'},
+ 'VX5-124':{type:'song_lap',dir:'Đông Nam',size:'8 × 18 m',land:144,build:294.5,total:20395531823,tts:16.921,h18:19.244,h24:20.162,h30:21.081,h36:22.101,gift:null,bank:'VPBank'},
+ 'VX5-126':{type:'song_lap',dir:'Đông Nam',size:'8 × 18 m',land:144,build:294.5,total:20395531823,tts:16.921,h18:19.244,h24:20.162,h30:21.081,h36:22.101,gift:GIFT,bank:'VPBank'},
+ 'VX3-87':{type:'don_lap',dir:'Đông Bắc, Tây Bắc (lô góc)',size:'Lô góc',land:257.5,build:433.3,total:46467762362,tts:39.341,h18:44.730,h24:46.818,h30:48.907,h36:51.228,gift:null,bank:'VPBank'}
+};
+const NS='http://www.w3.org/2000/svg';
+const svg=document.getElementById('map');
+const el=(n,a={},p=svg)=>{const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);p.appendChild(e);return e};
+const css=v=>`var(${v})`;
+const fmtTy=n=>n.toLocaleString('vi-VN',{minimumFractionDigits:3,maximumFractionDigits:3})+' tỷ';
+const fmtFull=n=>(n/1e9).toLocaleString('vi-VN',{minimumFractionDigits:3,maximumFractionDigits:3})+' tỷ';
+
+/* ---------- base map: cleaned aerial render ---------- */
+const defs=el('defs');
+el('image',{id:'aerial',href:'data:image/jpeg;base64,__IMG__',x:47,y:116,width:1189,height:742,preserveAspectRatio:'none'},defs);
+el('rect',{x:-400,y:-300,width:2100,height:1500,fill:css('--land')});
+el('use',{href:'#aerial'});
+const G=el('g');
+const lab=(x,y,t,r=0,c='slabel')=>{const e=el('text',{x,y,class:c,'text-anchor':'middle','dominant-baseline':'middle',transform:r?`rotate(${r} ${x} ${y})`:''});e.textContent=t;};
+// Tên đường nội khu đã in sẵn trên tổng mặt bằng CĐT; chỉ nhắc lại hai đại lộ để đọc được khi thu nhỏ.
+lab(900,812,'Đại lộ Hưng Đông · 25m',0,'blabel');
+lab(86,250,'Đại lộ Bốn Mùa · 25m',-87,'blabel');
+const al=(x,y,t)=>{const e=el('text',{x,y,class:'area-label','text-anchor':'middle'});e.textContent=t;};
+al(300,215,'Công viên trung tâm');al(1010,628,'Vịnh nội khu');al(1050,470,'Sông');
+// compass: image-up is north-west, so north sits 45° clockwise
+const cp=el('g',{transform:'translate(885 190)'});
+el('circle',{r:24,fill:css('--surface'),stroke:css('--accent'),'stroke-width':1.5},cp);
+const ar=el('g',{transform:'rotate(45)'},cp);
+el('path',{d:'M0 -18 L6 4 L0 0 L-6 4 Z',fill:css('--accent-2')},ar);
+el('path',{d:'M0 18 L6 -4 L0 0 L-6 -4 Z',fill:css('--muted')},ar);
+const ct=el('text',{x:0,y:-27,'text-anchor':'middle',fill:css('--accent-2'),style:'font:800 10px var(--font-ui)'},ar);ct.textContent='B';
+
+/* ---------- lots ---------- */
+const LG=el('g');const nodes=new Map();const BYID=new Map(LOTS.map(l=>[l.id,l]));
+LOTS.forEach(l=>{
+  const p=el('path',{d:'M'+l.p.map(q=>q.join(' ')).join(' L')+' Z',class:'lot'+(l.code?' feat':''),fill:css(TYPES[l.t].v),tabindex:l.code?0:-1,'data-id':l.id,role:'button','aria-label':l.no?('Căn '+l.no):TYPES[l.t].name},LG);
+  nodes.set(l.id,p);
+});
+const centroid=l=>{let x=0,y=0;l.p.forEach(q=>{x+=q[0];y+=q[1]});return[x/l.p.length,y/l.p.length]};
+const CO={'VX3-87':[413,232],'VX3-52':[587,232],'VX2-19':[757,296],'VX5-124':[188,240],'VX5-126':[188,352]};
+const GL=el('g');const PG=el('g');
+LOTS.filter(l=>l.code).forEach(l=>{
+  el('path',{d:'M'+l.p.map(q=>q.join(' ')).join(' L')+' Z',class:'glow'},GL);
+  const s=SALE[l.code],[bx,by]=CO[l.code],W=162,H=112,[cx,cy]=centroid(l);
+  const ax=Math.max(bx,Math.min(bx+W,cx)),ay=cy<by?by:by+H;
+  el('path',{d:`M${ax} ${ay} L${cx} ${cy}`,class:'leader','data-for':l.id},PG);
+  el('circle',{cx,cy,r:2.6,class:'dot','data-for':l.id},PG);
+  const g=el('g',{class:'co','data-id':l.id,'data-for':l.id,transform:`translate(${bx} ${by})`},PG);
+  el('rect',{width:W,height:H,rx:9,class:'bx',filter:'url(#sh)'},g);
+  el('path',{d:`M0 9 Q0 0 9 0 H${W-9} Q${W} 0 ${W} 9 V30 H0 Z`,class:'hd'},g);
+  const t=(x,y,c,txt,anchor='start')=>{const e=el('text',{x,y,class:c,'text-anchor':anchor},g);e.textContent=txt};
+  t(10,20,'ct',l.code);t(W-10,19,'ty',TYPES[s.type].short,'end');
+  t(10,46,'k','Hướng');t(W-10,46,'v',s.dir.replace(' (lô góc)',''),'end');
+  t(10,61,'k','DT đất · xây dựng');t(W-10,61,'v',`${s.land} · ${s.build} m²`.replace(/\./g,','),'end');
+  t(10,76,'k','Thanh toán sớm');t(W-10,76,'v',fmtTy(s.tts),'end');
+  t(10,99,'k','Tổng giá');t(W-10,100,'pr',fmtFull(s.total),'end');
+});
+// phones: the price boxes don't fit, so each lot for sale gets a small code tag next to it instead
+const pinsAt=[];LOTS.filter(l=>l.code).forEach(l=>{const[cx,cy]=centroid(l);const below=pinsAt.some(([x,y])=>Math.abs(x-cx)<44&&Math.abs(y-cy)<20);pinsAt.push([cx,cy]);
+  const w=l.code.length*5.6+10,y=below?cy+9:cy-23;const g=el('g',{class:'pin','data-id':l.id,'data-for':l.id},PG);
+  el('rect',{x:cx-w/2,y,width:w,height:14,rx:7},g);const e=el('text',{x:cx,y:y+7.5,'text-anchor':'middle','dominant-baseline':'middle'},g);e.textContent=l.code});
+const f=el('filter',{id:'sh',x:'-20%',y:'-20%',width:'140%',height:'150%'},defs);
+el('feDropShadow',{dx:0,dy:3,stdDeviation:4,'flood-color':'#000','flood-opacity':.28},f);
+
+/* ---------- filters ---------- */
+const state={types:new Set(Object.keys(TYPES)),saleOnly:false,sel:null};
+const legend=document.getElementById('legend');
+const counts={};LOTS.forEach(l=>counts[l.t]=(counts[l.t]||0)+1);
+Object.entries(TYPES).forEach(([k,t])=>{
+  const b=document.createElement('button');b.className='chip';b.setAttribute('aria-pressed','true');b.id='f-'+k;
+  b.innerHTML=`<i style="background:${css(t.v)}"></i>${t.short} <span style="color:var(--muted)">${counts[k]}</span>`;
+  b.onclick=()=>{state.types.has(k)?state.types.delete(k):state.types.add(k);b.setAttribute('aria-pressed',state.types.has(k));applyFilter()};
+  legend.appendChild(b);
+});
+const sb=document.createElement('button');sb.className='chip sale';sb.id='f-sale';sb.setAttribute('aria-pressed','false');sb.textContent='Căn đang mở bán · '+Object.keys(SALE).length;
+sb.onclick=()=>{state.saleOnly=!state.saleOnly;sb.setAttribute('aria-pressed',state.saleOnly);applyFilter()};
+legend.appendChild(sb);
+function applyFilter(){LOTS.forEach(l=>{const on=state.types.has(l.t)&&(!state.saleOnly||l.code);nodes.get(l.id).classList.toggle('dim',!on);if(l.code)svg.querySelectorAll(`[data-for="${l.id}"]`).forEach(e=>e.classList.toggle('off',!on))})}
+
+/* ---------- pan & zoom ---------- */
+const FULL={x:60,y:110,w:1120,h:720};let vb={...FULL};
+const BOUND={x0:110,y0:190,x1:1170,y1:800};
+const setVB=()=>{const cx=Math.min(BOUND.x1,Math.max(BOUND.x0,vb.x+vb.w/2)),cy=Math.min(BOUND.y1,Math.max(BOUND.y0,vb.y+vb.h/2));vb.x=cx-vb.w/2;vb.y=cy-vb.h/2;
+  svg.setAttribute('viewBox',`${vb.x} ${vb.y} ${vb.w} ${vb.h}`);svg.classList.toggle('compact',svg.getBoundingClientRect().width<700);svg.classList.toggle('zoomed',vb.w<Math.min(fitVB().w*0.42,startVB().w*0.8))};
+function fitVB(){const r=svg.getBoundingClientRect();const a=r.width/r.height,fa=FULL.w/FULL.h;
+  if(a>fa){const w=FULL.h*a;return{x:FULL.x-(w-FULL.w)/2,y:FULL.y,w,h:FULL.h}}const h=FULL.w/a;return{x:FULL.x,y:FULL.y-(h-FULL.h)/2,w:FULL.w,h}}
+function startVB(){const r=svg.getBoundingClientRect();const a=r.width/r.height;if(a>=1)return fitVB();
+  const h=742,w=h*a;return{x:640-w/2,y:116,w,h}}
+function toSvg(cx,cy){const r=svg.getBoundingClientRect();return[vb.x+(cx-r.left)/r.width*vb.w,vb.y+(cy-r.top)/r.height*vb.h]}
+function zoomAt(f,sx,sy){const base=fitVB();const nw=Math.min(base.w,Math.max(base.w/14,vb.w/f));const k=nw/vb.w;vb={x:sx-(sx-vb.x)*k,y:sy-(sy-vb.y)*k,w:nw,h:vb.h*k};setVB()}
+let anim;function animateTo(t){cancelAnimationFrame(anim);const s={...vb},t0=performance.now(),D=matchMedia('(prefers-reduced-motion:reduce)').matches?0:380;
+  const step=n=>{const k=D?Math.min(1,(n-t0)/D):1,e=1-Math.pow(1-k,3);vb={x:s.x+(t.x-s.x)*e,y:s.y+(t.y-s.y)*e,w:s.w+(t.w-s.w)*e,h:s.h+(t.h-s.h)*e};setVB();if(k<1)anim=requestAnimationFrame(step)};anim=requestAnimationFrame(step)}
+function focusLot(l){const base=fitVB();const[x,y]=centroid(l);const w=Math.min(vb.w,base.w/2.6),h=w*base.h/base.w;
+  const mobile=matchMedia('(max-width:820px)').matches;animateTo({x:x-w/2,y:y-h*(mobile?0.32:0.5),w,h})}
+const ptrs=new Map();let drag=null,moved=0,pinch=null;
+svg.addEventListener('pointerdown',e=>{svg.setPointerCapture(e.pointerId);ptrs.set(e.pointerId,[e.clientX,e.clientY]);moved=0;
+  if(ptrs.size===1)drag={x:e.clientX,y:e.clientY,vb:{...vb},target:e.target};
+  if(ptrs.size===2){const[a,b]=[...ptrs.values()];pinch={d:Math.hypot(a[0]-b[0],a[1]-b[1]),vb:{...vb},c:toSvg((a[0]+b[0])/2,(a[1]+b[1])/2)};drag=null}});
+svg.addEventListener('pointermove',e=>{if(!ptrs.has(e.pointerId))return;ptrs.set(e.pointerId,[e.clientX,e.clientY]);
+  if(pinch&&ptrs.size===2){const[a,b]=[...ptrs.values()];const d=Math.hypot(a[0]-b[0],a[1]-b[1]);vb={...pinch.vb};zoomAt(d/pinch.d,...pinch.c);const m=toSvg((a[0]+b[0])/2,(a[1]+b[1])/2);vb.x+=pinch.c[0]-m[0];vb.y+=pinch.c[1]-m[1];setVB();moved=99;return}
+  if(drag){const dx=e.clientX-drag.x,dy=e.clientY-drag.y;moved=Math.max(moved,Math.hypot(dx,dy));if(moved>5){svg.classList.add('dragging');const r=svg.getBoundingClientRect();vb={...drag.vb,x:drag.vb.x-dx/r.width*drag.vb.w,y:drag.vb.y-dy/r.height*drag.vb.h};setVB()}}});
+const end=e=>{ptrs.delete(e.pointerId);svg.classList.remove('dragging');
+  if(drag&&moved<=5&&e.type==='pointerup'){const t=document.elementFromPoint(e.clientX,e.clientY);const g=t&&t.closest('[data-id]');if(g)select(+g.dataset.id)}
+  if(ptrs.size<2&&pinch){pinch=null;const r=[...ptrs.values()][0];if(r)drag={x:r[0],y:r[1],vb:{...vb}}}if(ptrs.size===0)drag=null};
+svg.addEventListener('pointerup',end);svg.addEventListener('pointercancel',end);
+svg.addEventListener('wheel',e=>{e.preventDefault();zoomAt(Math.exp(-e.deltaY*0.0015),...toSvg(e.clientX,e.clientY))},{passive:false});
+svg.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.dataset.id){e.preventDefault();select(+e.target.dataset.id)}});
+document.getElementById('zin').onclick=()=>zoomAt(1.6,vb.x+vb.w/2,vb.y+vb.h/2);
+document.getElementById('zout').onclick=()=>zoomAt(1/1.6,vb.x+vb.w/2,vb.y+vb.h/2);
+document.getElementById('zfit').onclick=()=>animateTo(startVB());
+addEventListener('resize',()=>{if(state.sel==null){vb=startVB();setVB()}});
+
+/* ---------- card ---------- */
+const panel=document.getElementById('panel'),aside=document.getElementById('aside');
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function photo(l){const[x,y]=centroid(l);const w=190,h=w*9/16;const pts=l.p.map(q=>q.join(',')).join(' ');
+  return `<div class="photo"><svg viewBox="${x-w/2} ${y-h/2} ${w} ${h}" aria-label="Ảnh phối cảnh khu vực quanh lô"><use href="#aerial"/><polygon points="${pts}" fill="${css(TYPES[l.t].v)}" fill-opacity=".55" stroke="#ff6a3d" stroke-width="2"/></svg><span>Phối cảnh khu vực quanh lô</span></div>`}
+const xk=l=>l.t==='lien_ke'&&l.dt===126;
+function traits(l){const t=[];if(xk(l))t.push('Lô xẻ khe');if(l.f.length>1)t.push('Lô góc');if(l.t==='shophouse')t.push(l.f.length>1?'3 mặt tiền':'2 mặt tiền trước, sau');l.v.forEach(v=>t.push(v));return t}
+const OVERVIEW=`<div class="pol"><div class="eyebrow">Tổng quan phân khu</div><h3>10,5 ha · 747 căn thấp tầng</h3>
+<p>Chủ đầu tư: Công ty TNHH Phát triển bất động sản Vịnh Xanh 1 và Công ty TNHH Phát triển bất động sản Vịnh Xanh 2. Vị trí: Nghĩa Trụ, Hưng Yên.</p><p>Khu compound khép kín dọc sông Bắc Hưng Hải, cửa ngõ phía Bắc Ocean Park 3. Kiến trúc tân cổ điển Hy Lạp. Giáp Đại lộ Bốn Mùa (25m) và Đại lộ Hừng Đông (25m).</p>
+<div class="tbl"><table><thead><tr><th>Loại hình</th><th>Căn</th><th>Đất</th><th>Giá</th></tr></thead><tbody>
+${['don_lap','song_lap','lien_ke','shophouse'].map(k=>`<tr><td><b>${TYPES[k].short}</b><br><small class="note">${SPEC[k].fl} · MĐXD ${SPEC[k].dens}</small></td><td>${SPEC[k].n}</td><td style="white-space:nowrap">${SPEC[k].land.replace(' m²','')}<br><small class="note">m²</small></td><td style="white-space:nowrap">${SPEC[k].price}</td></tr>`).join('')}</tbody></table></div>
+<details><summary>Tiện ích nội khu (công viên trung tâm)</summary><p class="note" style="margin:4px 0">Số trên bản đồ công viên ứng với danh mục dưới đây. Tam giác cam là lối vào công viên.</p><ol class="amen"><li><b class="code">1</b> Artwork điểm nhấn</li><li><b class="code">2</b> Sân quảng trường</li><li><b class="code">3</b> Bãi cỏ ven hồ ngắm cảnh</li><li><b class="code">4</b> Thác tràn</li><li><b class="code">5</b> Hồ cá Koi</li><li><b class="code">6</b> Cầu cảnh quan</li><li><b class="code">7</b> Suối cạn, sỏi massage</li><li><b class="code">8</b> Vườn hoa Phong linh</li><li><b class="code">9</b> Vườn BBQ</li><li><b class="code">10</b> Đường chạy bộ sắc màu</li><li><b class="code">11</b> Sân bóng chuyền hơi</li><li><b class="code">12</b> Sân Pickleball</li><li><b class="code">13</b> Sân Tennis</li><li><b class="code">14</b> Sân bóng rổ tập ném</li><li><b class="code">15</b> Khu vui chơi trẻ em</li><li><b class="code">16</b> Artwork tượng</li><li><b class="code">17</b> Vườn xích đu</li><li><b class="code">18</b> Vườn Gyms</li><li><b class="code">19</b> Vườn cờ</li><li><b class="code">20</b> Vườn Yoga</li><li><b class="code">21</b> Sàn gỗ ngắm cảnh</li><li><b class="code">22</b> Giàn hoa</li><li><b class="code">23</b> Chòi nghỉ</li><li><b class="code">24</b> Nhà Gym, Locker</li><li><b class="code">A</b> Cổng vào kết hợp biển tên</li><li><b class="code">B</b> Artwork Hươu trang trí</li><li><b class="code">C</b> Sàn gỗ ven hồ cá Koi</li><li><b class="code">D</b> Chòi vọng cảnh điểm nhấn</li></ol><p class="note">Hạ tầng kỹ thuật: Trạm bơm chống ngập, Trạm BTS, Trạm biến áp, Nhà vệ sinh, nhà phụ trợ, Nhà Gym, Bể ngầm.</p></details>
+<details><summary>Pháp lý và vị trí sản phẩm</summary><p>Sở hữu lâu dài (sổ đỏ). Dự kiến bàn giao quý III/2026.</p><p>Shophouse nằm dọc hai đại lộ; 100% lô có 2 mặt tiền trước sau, lô góc 3 mặt tiền; hơn 80% lô shophouse là loại 110 m². Liền kề nằm trên các trục Vịnh Xanh 2, 3, 4.</p></details>
+<p class="note">Mã căn, diện tích từng lô, lộ giới và danh mục tiện ích theo tổng mặt bằng của chủ đầu tư. Khoảng giá và mật độ xây dựng theo vinhomesland.vn, mang tính tham khảo. Chính sách bán hàng bên dưới theo văn bản của chủ đầu tư.</p></div>`;
+function home(){
+  if(state.sel!=null)nodes.get(state.sel).classList.remove('sel');state.sel=null;
+  const items=LOTS.filter(l=>l.code).map(l=>{const s=SALE[l.code];return`<button class="fitem" data-go="${l.id}"><span class="tag" style="background:${css(TYPES[s.type].v)}">${TYPES[s.type].short}</span><span><span class="code">${l.code}</span><small>Hướng ${esc(s.dir)} · ${s.land} m² đất</small></span><span class="p">${fmtFull(s.total)}</span></button>`}).join('');
+  panel.innerHTML=`<div><div class="eyebrow">Quỹ căn đang mở bán</div><h2 style="margin:4px 0 0;font-size:20px;color:var(--accent)">${Object.keys(SALE).length} căn tại Vịnh Xanh</h2></div>
+  <div class="flist">${items}</div>
+  <p class="note" style="margin:0">Phân khu có khoảng ${LOTS.length} lô trên sơ đồ, gồm ${counts.song_lap} song lập, ${counts.xe_khe} liền kề xẻ khe, ${counts.don_lap} đơn lập và ${counts.shophouse} shophouse. Chạm vào lô bất kỳ để xem hướng, mặt đường và đặc điểm vị trí.</p>`;
+  panel.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>select(+b.dataset.go));
+  document.getElementById('grabTxt').textContent='Quỹ căn đang mở bán';
+}
+function select(id){
+  const l=BYID.get(id);if(!l)return;
+  if(state.sel!=null)nodes.get(state.sel).classList.remove('sel');state.sel=id;const n=nodes.get(id);n.classList.add('sel');n.parentNode.appendChild(n);
+  const T=TYPES[l.t],s=l.code&&SALE[l.code];
+  const dir=s?s.dir:l.f.map(d=>DN[d]).join(', ');
+  const tr=traits(l).map(t=>`<span class="badge">${esc(t)}</span>`).join('');
+  let body=`<dl class="spec">
+    <dt>Loại hình</dt><dd>${T.name}</dd>
+    <dt>Hướng${s?'':' (theo sơ đồ)'}</dt><dd>${esc(dir)}</dd>
+    <dt>Mặt đường</dt><dd>${esc(l.s)}</dd>${SPEC[l.t]&&!(s&&s.type==='xe_khe')?`<dt>Tầng cao</dt><dd>${SPEC[l.t].fl}</dd><dt>Mật độ xây dựng</dt><dd>${SPEC[l.t].dens}</dd>`:''}
+    ${s?`<dt>Kích thước đất</dt><dd>${esc(s.size)}</dd><dt>Diện tích đất</dt><dd>${s.land.toLocaleString('vi-VN')} m²</dd><dt>Diện tích xây dựng</dt><dd>${s.build.toLocaleString('vi-VN')} m²</dd><dt>Hiện trạng bàn giao</dt><dd>Thô</dd>`:`<dt>Kích thước</dt><dd>${T.size}</dd><dt>Tình trạng</dt><dd>Liên hệ để kiểm tra</dd>`}
+  </dl>`;
+  if(s){body+=`<div><div class="eyebrow" style="margin-bottom:8px">Giá bán (tạm tính)</div><div class="price">
+    <div class="total">Tổng giá niêm yết</div><div class="v total">${fmtFull(s.total)}</div>
+    <div>Thanh toán sớm</div><div class="v">${fmtTy(s.tts)}</div>
+    <div>Hỗ trợ lãi suất 18 tháng</div><div class="v">${fmtTy(s.h18)}</div>
+    <div>Hỗ trợ lãi suất 24 tháng</div><div class="v">${fmtTy(s.h24)}</div>
+    <div>Hỗ trợ lãi suất 30 tháng</div><div class="v">${fmtTy(s.h30)}</div>
+    <div>Hỗ trợ lãi suất 36 tháng</div><div class="v">${fmtTy(s.h36)}</div></div></div>
+    <dl class="spec"><dt>Ngân hàng hỗ trợ vay</dt><dd>${s.bank}</dd>${s.gift?`<dt>Quà tặng</dt><dd>${s.gift}</dd>`:''}</dl>`}
+  else body+=`${SPEC[l.t]?`<div class="price"><div>Diện tích đất loại hình này</div><div class="v">${SPEC[l.t].land}</div><div>Giá tham khảo loại hình</div><div class="v">${SPEC[l.t].price}</div></div>`:''}<p class="note" style="margin:0">Mã căn và diện tích theo tổng mặt bằng của chủ đầu tư. Giá và tình trạng của căn sẽ được chuyên viên tư vấn gửi theo bảng hàng mới nhất; khoảng giá theo loại hình chỉ để tham khảo.</p>`;
+  panel.innerHTML=`<div class="card-h"><div><div class="eyebrow">${s?'Đang mở bán':'Lô trong phân khu'}</div><h2>${s?`<span class="code">${l.code}</span>`:l.no?`<span class="code">${l.no}</span>`:T.name}</h2>${!s&&l.no?`<div class="note">${T.name}</div>`:''}</div><button class="close" id="back" aria-label="Quay lại danh sách">✕</button></div>
+    <div class="badges"><span class="tag" style="background:${css(T.v)}">${T.short}</span>${tr}</div>${photo(l)}${body}`;
+  document.getElementById('back').onclick=()=>{home();animateTo(startVB())};
+  document.getElementById('grabTxt').textContent=s?l.code:(l.no||T.name);
+  aside.classList.remove('collapsed');panel.scrollTop=0;aside.scrollTop=0;
+  focusLot(l);
+}
+document.getElementById('grab').onclick=()=>aside.classList.toggle('collapsed');
+document.getElementById('searchForm').addEventListener('submit',e=>{e.preventDefault();const q=document.getElementById('q').value.trim().toUpperCase().replace(/\s/g,'');
+  const l=LOTS.find(x=>x.code===q)||LOTS.find(x=>x.no===q)||LOTS.find(x=>x.no&&x.no.replace(/-0/,'-')===q.replace(/-0/,'-'));const i=document.getElementById('q');
+  if(l){i.blur();select(l.id);i.setCustomValidity('')}else{i.setCustomValidity('Không tìm thấy mã căn này trên sơ đồ');i.reportValidity()}});
+document.getElementById('q').addEventListener('input',e=>e.target.setCustomValidity(''));
+vb=startVB();setVB();home();if(matchMedia('(max-width:820px)').matches)aside.classList.add('collapsed');
+</script>
