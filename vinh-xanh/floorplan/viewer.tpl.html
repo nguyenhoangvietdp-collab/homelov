@@ -1,0 +1,75 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mặt bằng mẫu nhà dựng lại</title>
+<style>
+:root{--bg:#faf7f2;--surface:#fff;--fg:#2a2420;--muted:#7d7168;--line:#ece5db;--accent:#e0245e}
+@media (prefers-color-scheme:dark){:root{--bg:#1b1714;--surface:#26211d;--fg:#f5efe8;--muted:#b3a69a;--line:#3a332d;--accent:#ff5c8a}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 system-ui,"Segoe UI",Roboto,sans-serif;height:100vh;display:grid;grid-template-rows:auto 1fr}
+header{padding:10px 16px;background:var(--surface);border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center}
+h1{font-size:16px;margin:0}small{color:var(--muted)}.row{display:flex;gap:6px;flex-wrap:wrap}
+button{font:600 13px inherit;font-family:inherit;border:1px solid var(--line);background:var(--bg);color:var(--fg);padding:6px 12px;border-radius:999px;cursor:pointer}
+button[aria-pressed=true]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+main{display:grid;grid-template-columns:minmax(0,1fr) 290px;min-height:0;overflow:hidden}
+#stage{position:relative;overflow:hidden;background:#fff;touch-action:none;cursor:grab}
+#stage svg{overflow:hidden;position:absolute;inset:0;width:100%;height:100%;display:block}
+aside{border-left:1px solid var(--line);background:var(--surface);padding:14px;overflow:auto;display:flex;flex-direction:column;gap:12px}
+aside h2{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 4px}
+label{display:flex;justify-content:space-between;gap:8px;padding:2px 0;cursor:pointer}
+.big{font-size:26px;font-weight:600;color:var(--accent)}
+.room{fill:#e0245e;fill-opacity:.0;stroke:#e0245e;stroke-width:.8;cursor:pointer}.rooms.on .room{fill-opacity:.1}.room:hover,.room.sel{fill-opacity:.28!important}
+.rl text{font:700 6.5px system-ui;fill:#b3123f;paint-order:stroke;stroke:#fff;stroke-width:2.2px;text-anchor:middle;pointer-events:none}
+.rl .a{font-weight:500;font-size:6px}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}.tbl td{padding:3px 0;border-bottom:1px solid var(--line)}.tbl td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+@media(max-width:820px){main{grid-template-columns:1fr;grid-template-rows:1fr auto}aside{border-left:0;border-top:1px solid var(--line);max-height:42vh}}
+</style></head><body>
+<header><h1>Mặt bằng mẫu nhà dựng lại từ PDF vector</h1><div class="row" id="codes"></div><div class="row" id="floors"></div></header>
+<main><div id="stage"></div>
+<aside><div><h2 id="fname"></h2><div class="big" id="farea"></div><small id="fmeta"></small></div>
+<div><h2>Vùng phòng dò được (thử nghiệm)</h2><table class="tbl" id="rooms"></table><small id="rnote"></small></div>
+<div><h2>Layer</h2><div id="layers"></div></div>
+<div><label><span>Tên phòng</span><input type="checkbox" id="tl" checked></label><label><span>Vùng phòng + diện tích (thử nghiệm)</span><input type="checkbox" id="tr"></label></div>
+<div class="row" id="dl"></div>
+<small>Diện tích phòng chỉ là thử nghiệm: dò từ nét tường trên bản vẽ, chưa đủ tin cậy vì nhiều phòng thông nhau. Không dùng làm số liệu. Số chính thức là diện tích sàn từng tầng của chủ đầu tư.</small></aside></main>
+<script>
+const D=__DATA__;const NS='http://www.w3.org/2000/svg';
+const RN={'P. NGỦ':'Phòng ngủ','P.NGỦ':'Phòng ngủ','P.KHÁCH':'Phòng khách','P. KHÁCH':'Phòng khách','BẾP & ĂN':'Bếp và ăn','P. SHC':'Phòng sinh hoạt chung','P.SHC':'Phòng sinh hoạt chung','P. ĐA NĂNG':'Phòng đa năng','SÂN KT':'Sân kỹ thuật','P. THỜ':'Phòng thờ','P.THỜ':'Phòng thờ','P. LÀM VIỆC':'Phòng làm việc'};
+const nm=t=>RN[t]||t;const fm=n=>n.toLocaleString('vi-VN',{minimumFractionDigits:1,maximumFractionDigits:1});
+const GL={WALL:'Tường',CONC:'Cột, bê tông',DOOR:'Cửa, ô thoáng',FURN:'Nội thất',PATT:'Hatch, ký hiệu',FINE:'Chi tiết mảnh',STRS:'Thang, lan can',OTHER:'Khác'};
+const st=document.getElementById('stage');let code,fl,vb,base;const on={};for(const g in GL)on[g]=true;
+const codes=document.getElementById('codes'),floors=document.getElementById('floors');
+for(const c in D){const b=document.createElement('button');b.textContent=c;b.id='c-'+c;b.onclick=()=>pick(c,'1');codes.appendChild(b)}
+function el(n,a,p){const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);p&&p.appendChild(e);return e}
+function pick(c,f){code=c;const d=D[c];floors.innerHTML='';d.order.forEach(k=>{const b=document.createElement('button');b.textContent=d.floors[k].name;b.id='f-'+k;b.onclick=()=>show(k);floors.appendChild(b)});
+ document.querySelectorAll('#codes button').forEach(b=>b.setAttribute('aria-pressed',b.id==='c-'+c));show(f)}
+function show(k){fl=k;const d=D[code],f=d.floors[k];st.innerHTML='<svg xmlns="http://www.w3.org/2000/svg"></svg>';const s=st.firstChild;
+ base=f.box.slice();vb=base.slice();s.setAttribute('viewBox',vb.join(' '));
+ const g=el('g',{class:'plan'},s);g.innerHTML=f.svg;
+ const nl=el('g',{class:'rl',id:'nl'},s),rg=el('g',{class:'rooms on',id:'rg'},s),lg=el('g',{class:'rl',id:'lg'},s);
+ f.labels.forEach(l=>{const t=el('text',{x:l.x,y:l.y+2},nl);t.textContent=l.n});
+ f.rooms.forEach((r,i)=>{const p=el('polygon',{points:r.poly.map(q=>q.join(',')).join(' '),class:'room'},rg);p.onclick=e=>{document.querySelectorAll('.room.sel').forEach(x=>x.classList.remove('sel'));p.classList.add('sel')};
+  const t=el('text',{x:r.lx,y:r.ly-1},lg);t.textContent=r.names.map(nm).join(' + ');const a=el('text',{x:r.lx,y:r.ly+7,class:'a'},lg);a.textContent=(r.combined?'≈ ':'≈ ')+fm(r.area)+' m²'});
+ document.querySelectorAll('#floors button').forEach(b=>b.setAttribute('aria-pressed',b.id==='f-'+k));
+ document.getElementById('fname').textContent=d.code+' · '+f.name;document.getElementById('farea').textContent=fm(f.area_m2)+' m² sàn';
+ document.getElementById('fmeta').textContent='Tỉ lệ '+d.k+' pt/m · '+(d.calibrated?'đã hiệu chỉnh':'CHƯA hiệu chỉnh');
+ document.getElementById('rooms').innerHTML=f.rooms.map(r=>`<tr><td>${r.names.map(nm).join(' + ')}</td><td>${fm(r.area)} m²</td></tr>`).join('')||'<tr><td>Không phòng nào qua được bộ kiểm tra</td><td></td></tr>';
+ const lab=f.labels.map(l=>l.t),got=new Set(f.rooms.flatMap(r=>r.names));const miss=lab.filter(t=>!got.has(t));
+ document.getElementById('rnote').textContent=miss.length?'Không có diện tích (không qua kiểm tra): '+[...new Set(miss.map(nm))].join(', '):'';
+ const L=document.getElementById('layers');L.innerHTML='';for(const k2 in f.counts){if(!GL[k2])continue;const lb=document.createElement('label');lb.innerHTML=`<span>${GL[k2]}</span><input type="checkbox" ${on[k2]?'checked':''}>`;lb.querySelector('input').onchange=e=>{on[k2]=e.target.checked;apply()};L.appendChild(lb)}
+ document.getElementById('dl').innerHTML='<button id="dsvg">Tải SVG</button><button id="djson">Tải JSON</button>';
+ document.getElementById('dsvg').onclick=()=>dl(`${code}_T${k}.svg`,st.firstChild.outerHTML.replace('<svg','<svg xmlns="http://www.w3.org/2000/svg"'),'image/svg+xml');
+ document.getElementById('djson').onclick=()=>dl(`${code}_T${k}.json`,JSON.stringify({code,floor:k,k_pt_per_m:d.k,area_table_m2:f.area_m2,rooms:f.rooms.map(r=>({names:r.names,area_m2:r.area,polygon_pt:r.poly})),labels:f.labels},null,1),'application/json');
+ apply()}
+function dl(n,t,m){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:m}));a.download=n;a.click()}
+function apply(){st.querySelectorAll('g[class^=L-]').forEach(g=>g.style.display=on[g.getAttribute('class').slice(2)]?'':'none');
+ const r=document.getElementById('rg'),l=document.getElementById('lg');if(r)r.style.display=document.getElementById('tr').checked?'':'none';if(l)l.style.display=document.getElementById('tl').checked?'':'none'}
+document.getElementById('tr').onchange=apply;document.getElementById('tl').onchange=apply;
+const sv=()=>st.firstChild.setAttribute('viewBox',vb.join(' '));
+function pt(e){const r=st.getBoundingClientRect(),sc=Math.min(r.width/vb[2],r.height/vb[3]);return[vb[0]+(e.clientX-r.left-(r.width-vb[2]*sc)/2)/sc,vb[1]+(e.clientY-r.top-(r.height-vb[3]*sc)/2)/sc,sc]}
+st.addEventListener('wheel',e=>{e.preventDefault();const[x,y]=pt(e);const nw=Math.min(base[2]*1.2,Math.max(base[2]/30,vb[2]*Math.exp(e.deltaY*.0015))),f=nw/vb[2];vb=[x-(x-vb[0])*f,y-(y-vb[1])*f,nw,vb[3]*f];sv()},{passive:false});
+const P=new Map();let d0=null;
+st.addEventListener('pointerdown',e=>{st.setPointerCapture(e.pointerId);P.set(e.pointerId,[e.clientX,e.clientY]);d0=null});
+st.addEventListener('pointermove',e=>{if(!P.has(e.pointerId))return;const o=P.get(e.pointerId);P.set(e.pointerId,[e.clientX,e.clientY]);
+ if(P.size===2){const v=[...P.values()],d=Math.hypot(v[0][0]-v[1][0],v[0][1]-v[1][1]);if(d0){const[x,y]=pt({clientX:(v[0][0]+v[1][0])/2,clientY:(v[0][1]+v[1][1])/2});const f=Math.min(base[2]*1.2/vb[2],Math.max(base[2]/30/vb[2],d0/d));vb=[x-(x-vb[0])*f,y-(y-vb[1])*f,vb[2]*f,vb[3]*f];sv()}d0=d;return}
+ const sc=pt(e)[2];vb[0]-=(e.clientX-o[0])/sc;vb[1]-=(e.clientY-o[1])/sc;sv()});
+const up=e=>{P.delete(e.pointerId);d0=null};st.addEventListener('pointerup',up);st.addEventListener('pointercancel',up);st.addEventListener('dblclick',()=>{vb=base.slice();sv()});
+const q=new URLSearchParams(location.search);pick(q.get('c')||Object.keys(D)[0],q.get('f')||'1');
+</script></body></html>

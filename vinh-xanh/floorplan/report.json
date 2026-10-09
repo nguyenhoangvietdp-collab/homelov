@@ -1,0 +1,870 @@
+{
+ "DL1-02": {
+  "floors": {
+   "1": {
+    "area_table": 97.5,
+    "labels": [
+     "WC",
+     "BẾP & ĂN",
+     "P. KHÁCH"
+    ],
+    "rooms_ok": [],
+    "rooms_skipped": [
+     [
+      "WC",
+      "hình dạng không gọn (độ đặc 0.84), nghi lẫn cầu thang hoặc phòng kề"
+     ],
+     [
+      "BẾP & ĂN + P. KHÁCH",
+      "vùng loang chạm mép khung (hở tường ngoài)"
+     ]
+    ],
+    "rooms_sum": 0,
+    "svg_kb": 93
+   },
+   "2": {
+    "area_table": 98.8,
+    "labels": [
+     "WC",
+     "P. NGỦ",
+     "P. NGỦ",
+     "WC",
+     "P. SHC"
+    ],
+    "rooms_ok": [],
+    "rooms_skipped": [
+     [
+      "WC",
+      "hình dạng không gọn (độ đặc 0.66), nghi lẫn cầu thang hoặc phòng kề"
+     ],
+     [
+      "P. NGỦ + P. NGỦ + WC + P. SHC",
+      "vùng loang chạm mép khung (hở tường ngoài)"
+     ]
+    ],
+    "rooms_sum": 0,
+    "svg_kb": 131
+   },
+   "3": {
+    "area_table": 98.6,
+    "labels": [
+     "WC",
+     "P. NGỦ",
+     "P. NGỦ",
+     "WC",
+     "P. SHC"
+    ],
+    "rooms_ok": [],
+    "rooms_skipped": [
+     [
+      "WC",
+      "hình dạng không gọn (độ đặc 0.66), nghi lẫn cầu thang hoặc phòng kề"
+     ],
+     [
+      "P. NGỦ + P. NGỦ + P. SHC",
+      "vùng loang chạm mép khung (hở tường ngoài)"
+     ],
+     [
+      "WC",
+      "hình dạng không gọn (độ đặc 0.83), nghi lẫn cầu thang hoặc phòng kề"
+     ]
+    ],
+    "rooms_sum": 0,
+    "svg_kb": 146
+   },
+   "4": {
+    "area_table": 91.0,
+    "labels": [
+     "WC",
+     "P. ĐA NĂNG",
+     "P. TẬP",
+     "SÂN"
+    ],
+    "rooms_ok": [],
+    "rooms_skipped": [
+     [
+      "WC",
+      "hình dạng không gọn (độ đặc 0.80), nghi lẫn cầu thang hoặc phòng kề"
+     ],
+     [
+      "P. ĐA NĂNG + SÂN",
+      "vùng loang chạm mép khung (hở tường ngoài)"
+     ],
+     [
+      "P. TẬP",
+      "vùng loang chạm mép khung (hở tường ngoài)"
+     ]
+    ],
+    "rooms_sum": 0,
+    "svg_kb": 135
+   },
+   "TUM": {
+    "area_table": 13.6,
+    "labels": [
+     "SÂN KT"
+    ],
+    "rooms_ok": [],
+    "rooms_skipped": [
+     [
+      "SÂN KT",
+      "vùng loang chạm mép khung (hở tường ngoài)"
+     ]
+    ],
+    "rooms_sum": 0,
+    "svg_kb": 49
+   }
+  },
+  "issues": [],
+  "calibration": {
+   "lot_bbox_pt": [
+    86.8,
+    190.4,
+    257.2,
+    474.3
+   ],
+   "k_from_width": 14.196,
+   "k_from_length": 14.191,
+   "diff_pct": 0.03,
+   "k_pt_per_m": 14.194
+  }
+ },
+ "DL1-06": {
+  "floors": {
+   "1": {
+    "area_table": 98.5,
+    "labels": [
+     "WC",
+     "P. KHÁCH",
+     "BẾP & ĂN"
+    ],
+    "rooms_ok": [
+     [
+      "WC",
+      1.5
+     ]
+    ],
+    "rooms_skipped": [
+     [
+      "P. KHÁCH + BẾP & ĂN",
+      "vùng quá lớn so với diện tích tầng (nghi thông sang phòng khác)"
+     ]
+    ],
+    "rooms_sum": 1.5,
+    "svg_kb": 227
+   },
+   "2": {
+    "area_table": 108.2,
+    "labels": [
+     "P. NGỦ",
+     "P. NGỦ",
+     "WC",
+     "WC"
+    ],
+    "rooms_ok": [
+     [
+      "WC",
+      2.7
+     ]
+    ],
+    "rooms_skipped": [
+     [
+      "P. NGỦ",
+      "vùng loang chạm mép khung (hở tường ngoài)"
+     ],
+     [
+      "P. NGỦ",
+      "vùng loang chạm mép khung (hở tường ngoài)"
+     ],
+     [
+      "WC",
+      "hình dạng không gọn (độ đặc 0.87), nghi lẫn cầu thang hoặc phòng kề"
+     ]
+    ],
+    "rooms_sum": 2.7,
+    "svg_kb": 117
+   },
+   "3": {
+    "area_table": 110.1,
+    "labels": [
+     "P. NGỦ",
+     "P. NGỦ",
+     "WC",
+     "WC"
+    ],
+    "rooms_ok": [
+     [
+      "WC",
+      3.1
+     ]
+    ],
+    "rooms_skipped": [
+     [
+      "P. NGỦ",
+      "vùng loang chạm mép khung (hở tường ngoài)"
+     ],
+     [
+      "P. NGỦ",
+      "vùng loang chạm mép khung (hở tường ngoài)"
+     ],
+     [
+      "WC",
+      "hình dạng không gọn (độ đặc 0.89), nghi lẫn cầu thang hoặc phòng kề"
+     ]
+    ],
+    "rooms_sum": 3.1,
+    "svg_kb": 190
+   },
+   "4": {
+    "area_table": 98.6,
+    "labels": [
+     "WC",
+     "P. ĐA NĂNG",
+     "P. TẬP"
+    ],
+    "rooms_ok": [],
+    "rooms_skipped": [
+     [
+      "WC + P. TẬP",
+      "vùng loang chạm mép khung (hở tường ngoài)"
+     ],
+     [
+      "P. ĐA NĂNG",
+      "vùng loang chạm mép khung (hở tường ngoài)"
+     ]
+    ],
+    "rooms_sum": 0,
+    "svg_kb": 130
+   },
+   "TUM": {
+    "area_table": 16.3,
+    "labels": [
+     "SÂN KT"
+    ],
+    "rooms_ok": [],
+    "rooms_skipped": [
+     [
+      "SÂN KT",
+      "vùng loang chạm mép khung (hở tường ngoài)"
+     ]
+    ],
+    "rooms_sum": 0,
+    "svg_kb": 52
+   }
+  },
+  "issues": [],
+  "calibration": {
+   "lot_bbox_pt": [
+    93.2,
+    196.2,
+    282.8,
+    487.8
+   ],
+   "k_from_width": 14.588,
+   "k_from_length": 14.58,
+   "diff_pct": 0.06,
+   "k_pt_per_m": 14.584
+  }
+ },
+ "SL2-01": {
+  "floors": {
+   "1": {
+    "area_table": 57.2,
+    "labels": [
+     "WC",
+     "P.KHÁCH",
+     "BẾP & ĂN"
+    ],
+    "rooms_ok": [],
+    "rooms_skipped": [
+     [
+      "WC + P.KHÁCH",
+      "vùng quá lớn so với diện tích tầng (nghi thông sang phòng khác)"
+     ],
+     [
+      "BẾP & ĂN",
+      "vùng loang chạm mép khung (hở tường ngoài)"
+     ]
+    ],
+    "rooms_sum": 0,
+    "svg_kb": 88
+   },
+   "2": {
+    "area_table": 58.2,
+    "labels": [
+     "P. SHC",
+     "WC",
+     "P. NGỦ"
+    ],
+    "rooms_ok": [],
+    "rooms_skipped": [
+     [
+      "P. SHC + WC + P. NGỦ",
+      "vùng loang chạm mép khung (hở tường ngoài)"
+     ]
+    ],
+    "rooms_sum": 0,
+    "svg_kb": 83
+   },
+   "3": {
+    "area_table": 60.8,
+    "labels": [
+     "WC",
+     "WC",
+     "P. NGỦ",
+     "P. NGỦ"
+    ],
+    "rooms_ok": [],
+    "rooms_skipped": [
+     [
+      "WC + WC + P. NGỦ + P. NGỦ",
+      "vùng loang chạm mép khung (hở tường ngoài)"
+     ]
+    ],
+    "rooms_sum": 0,
+    "svg_kb": 113
+   },
+   "4": {
+    "area_table": 61.6,
+    "labels": [
+     "WC",
+     "P. ĐA NĂNG",
+     "P. NGỦ"
+    ],
+    "rooms_ok": [],
+    "rooms_skipped": [
+     [
+      "WC + P. ĐA NĂNG + P. NGỦ",
+      "vùng loang chạm mép khung (hở tường ngoài)"
+     ]
+    ],
+    "rooms_sum": 0,
+    "svg_kb": 140
+   },
+   "TUM": {
+    "area_table": 11.1,
+    "labels": [
+     "SÂN KT"
+    ],
+    "rooms_ok": [],
+    "rooms_skipped": [
+     [
+      "SÂN KT",
+      "vùng loang chạm mép khung (hở tường ngoài)"
+     ]
+    ],
+    "rooms_sum": 0,
+    "svg_kb": 21
+   }
+  },
+  "issues": [],
+  "calibration": {
+   "lot_bbox_pt": [
+    113.6,
+    167.8,
+    233.0,
+    474.3
+   ],
+   "k_from_width": 17.054,
+   "k_from_length": 17.024,
+   "diff_pct": 0.17,
+   "k_pt_per_m": 17.039
+  }
+ },
+ "SL2-01G": {
+  "floors": {
+   "1": {
+    "area_table": 113.4,
+    "labels": [
+     "BẾP & ĂN",
+     "P.KHÁCH",
+     "WC"
+    ],
+    "rooms_ok": [],
+    "rooms_skipped": [
+     [
+      "BẾP & ĂN + P.KHÁCH + WC",
+      "vùng quá lớn so với diện tích tầng (nghi thông sang phòng khác)"
+     ]
+    ],
+    "rooms_sum": 0,
+    "svg_kb": 251
+   },
+   "2": {
+    "area_table": 117.8,
+    "labels": [
+     "WC",
+     "P. NGỦ",
+     "WC",
+     "P. NGỦ",
+     "P. LÀM VIỆC"
+    ],
+    "rooms_ok": [],
+    "rooms_skipped": [
+     [
+      "WC + P. NGỦ + WC + P. NGỦ + P. LÀM VIỆC",
+      "vùng quá lớn so với diện tích tầng (nghi thông sang phòng khác)"
+     ]
+    ],
+    "rooms_sum": 0,
+    "svg_kb": 255
+   },
+   "3": {
+    "area_table": 121.6,
+    "labels": [
+     "WC",
+     "P. NGỦ",
+     "P. NGỦ",
+     "WC"
+    ],
+    "rooms_ok": [],
+    "rooms_skipped": [
+     [
+      "WC + P. NGỦ + P. NGỦ + WC",
+      "vùng loang chạm mép khung (hở tường ngoài)"
+     ]
+    ],
+    "rooms_sum": 0,
+    "svg_kb": 290
+   },
+   "4": {
+    "area_table": 124.2,
+    "labels": [
+     "SÂN",
+     "ĐA NĂNG",
+     "SÂN"
+    ],
+    "rooms_ok": [],
+    "rooms_skipped": [
+     [
+      "ĐA NĂNG",
+      "vùng loang chạm mép khung (hở tường ngoài)"
+     ]
+    ],
+    "rooms_sum": 0,
+    "svg_kb": 208
+   },
+   "TUM": {
+    "area_table": 22.2,
+    "labels": [
+     "SÂN KT"
+    ],
+    "rooms_ok": [],
+    "rooms_skipped": [
+     [
+      "SÂN KT",
+      "vùng loang chạm mép khung (hở tường ngoài)"
+     ]
+    ],
+    "rooms_sum": 0,
+    "svg_kb": 29
+   }
+  },
+  "issues": [],
+  "calibration": {
+   "lot_bbox_pt": [
+    70.7,
+    167.8,
+    309.2,
+    474.3
+   ],
+   "k_from_width": 17.033,
+   "k_from_length": 17.024,
+   "diff_pct": 0.05,
+   "k_pt_per_m": 17.029
+  }
+ },
+ "SL2-02": {
+  "floors": {
+   "1": {
+    "area_table": 67.8,
+    "labels": [
+     "WC",
+     "BẾP & ĂN",
+     "P.KHÁCH"
+    ],
+    "rooms_ok": [],
+    "rooms_skipped": [
+     [
+      "WC",
+      "hình dạng không gọn (độ đặc 0.70), nghi lẫn cầu thang hoặc phòng kề"
+     ],
+     [
+      "BẾP & ĂN",
+      "vùng loang chạm mép khung (hở tường ngoài)"
+     ],
+     [
+      "P.KHÁCH",
+      "vùng quá lớn so với diện tích tầng (nghi thông sang phòng khác)"
+     ]
+    ],
+    "rooms_sum": 0,
+    "svg_kb": 90
+   },
+   "2": {
+    "area_table": 68.8,
+    "labels": [
+     "P. SHC",
+     "WC",
+     "P. NGỦ",
+     "WC"
+    ],
+    "rooms_ok": [
+     [
+      "WC",
+      2.5
+     ]
+    ],
+    "rooms_skipped": [
+     [
+      "P. SHC",
+      "vùng quá lớn so với diện tích tầng (nghi thông sang phòng khác)"
+     ],
+     [
+      "P. NGỦ",
+      "vùng loang chạm mép khung (hở tường ngoài)"
+     ],
+     [
+      "WC",
+      "hình dạng không gọn (độ đặc 0.85), nghi lẫn cầu thang hoặc phòng kề"
+     ]
+    ],
+    "rooms_sum": 2.5,
+    "svg_kb": 87
+   },
+   "3": {
+    "area_table": 71.8,
+    "labels": [
+     "WC",
+     "P. NGỦ",
+     "P. NGỦ",
+     "WC"
+    ],
+    "rooms_ok": [
+     [
+      "WC",
+      2.5
+     ],
+     [
+      "P. NGỦ",
+      22.2
+     ]
+    ],
+    "rooms_skipped": [
+     [
+      "P. NGỦ",
+      "hình dạng không gọn (độ đặc 0.82), nghi lẫn cầu thang hoặc phòng kề"
+     ],
+     [
+      "WC",
+      "hình dạng không gọn (độ đặc 0.85), nghi lẫn cầu thang hoặc phòng kề"
+     ]
+    ],
+    "rooms_sum": 24.7,
+    "svg_kb": 103
+   },
+   "4": {
+    "area_table": 72.6,
+    "labels": [
+     "WC",
+     "P. ĐA NĂNG",
+     "P. NGỦ"
+    ],
+    "rooms_ok": [
+     [
+      "WC",
+      2.6
+     ]
+    ],
+    "rooms_skipped": [
+     [
+      "P. ĐA NĂNG",
+      "vùng loang chạm mép khung (hở tường ngoài)"
+     ],
+     [
+      "P. NGỦ",
+      "hình dạng không gọn (độ đặc 0.80), nghi lẫn cầu thang hoặc phòng kề"
+     ]
+    ],
+    "rooms_sum": 2.6,
+    "svg_kb": 169
+   },
+   "TUM": {
+    "area_table": 13.0,
+    "labels": [
+     "SÂN KT"
+    ],
+    "rooms_ok": [],
+    "rooms_skipped": [
+     [
+      "SÂN KT",
+      "vùng loang chạm mép khung (hở tường ngoài)"
+     ]
+    ],
+    "rooms_sum": 0,
+    "svg_kb": 22
+   }
+  },
+  "issues": [],
+  "calibration": {
+   "lot_bbox_pt": [
+    113.6,
+    167.8,
+    250.0,
+    474.3
+   ],
+   "k_from_width": 17.046,
+   "k_from_length": 17.024,
+   "diff_pct": 0.13,
+   "k_pt_per_m": 17.035
+  }
+ },
+ "LK1": {
+  "floors": {
+   "1": {
+    "area_table": 72.9,
+    "labels": [
+     "WC",
+     "P. KHÁCH",
+     "BẾP & ĂN"
+    ],
+    "rooms_ok": [
+     [
+      "WC",
+      2.3
+     ]
+    ],
+    "rooms_skipped": [
+     [
+      "P. KHÁCH + BẾP & ĂN",
+      "vùng quá lớn so với diện tích tầng (nghi thông sang phòng khác)"
+     ]
+    ],
+    "rooms_sum": 2.3,
+    "svg_kb": 94
+   },
+   "2": {
+    "area_table": 72.8,
+    "labels": [
+     "P. NGỦ",
+     "WC",
+     "P.SHC"
+    ],
+    "rooms_ok": [],
+    "rooms_skipped": [
+     [
+      "WC",
+      "nhãn nằm trên nét tường"
+     ],
+     [
+      "P. NGỦ",
+      "vùng loang chạm mép khung (hở tường ngoài)"
+     ],
+     [
+      "P.SHC",
+      "vùng loang chạm mép khung (hở tường ngoài)"
+     ]
+    ],
+    "rooms_sum": 0,
+    "svg_kb": 77
+   },
+   "3": {
+    "area_table": 78.4,
+    "labels": [
+     "WC",
+     "P. LÀM VIỆC",
+     "P. NGỦ"
+    ],
+    "rooms_ok": [
+     [
+      "WC",
+      2.8
+     ]
+    ],
+    "rooms_skipped": [
+     [
+      "P. LÀM VIỆC + P. NGỦ",
+      "vùng loang chạm mép khung (hở tường ngoài)"
+     ]
+    ],
+    "rooms_sum": 2.8,
+    "svg_kb": 71
+   },
+   "4": {
+    "area_table": 75.9,
+    "labels": [
+     "WC",
+     "P. NGỦ",
+     "WC",
+     "P. NGỦ"
+    ],
+    "rooms_ok": [
+     [
+      "WC",
+      2.8
+     ],
+     [
+      "WC",
+      2.7
+     ]
+    ],
+    "rooms_skipped": [
+     [
+      "P. NGỦ",
+      "vùng loang chạm mép khung (hở tường ngoài)"
+     ],
+     [
+      "P. NGỦ",
+      "vùng quá lớn so với diện tích tầng (nghi thông sang phòng khác)"
+     ]
+    ],
+    "rooms_sum": 5.5,
+    "svg_kb": 113
+   },
+   "TUM": {
+    "area_table": 59.0,
+    "labels": [
+     "WC",
+     "SÂN KT",
+     "P. ĐA NĂNG"
+    ],
+    "rooms_ok": [],
+    "rooms_skipped": [
+     [
+      "WC",
+      "hình dạng không gọn (độ đặc 0.83), nghi lẫn cầu thang hoặc phòng kề"
+     ],
+     [
+      "SÂN KT",
+      "vùng loang chạm mép khung (hở tường ngoài)"
+     ],
+     [
+      "P. ĐA NĂNG",
+      "vùng quá lớn so với diện tích tầng (nghi thông sang phòng khác)"
+     ]
+    ],
+    "rooms_sum": 0,
+    "svg_kb": 95
+   }
+  },
+  "issues": [],
+  "calibration": {
+   "lot_bbox_pt": [
+    127.0,
+    166.2,
+    208.2,
+    458.1
+   ],
+   "k_from_width": 16.243,
+   "k_from_length": 16.216,
+   "diff_pct": 0.17,
+   "k_pt_per_m": 16.23
+  }
+ },
+ "SH1": {
+  "floors": {
+   "1": {
+    "area_table": 88.0,
+    "labels": [
+     "WC",
+     "DỊCH VỤ"
+    ],
+    "rooms_ok": [
+     [
+      "WC",
+      1.9
+     ]
+    ],
+    "rooms_skipped": [
+     [
+      "DỊCH VỤ",
+      "vùng loang chạm mép khung (hở tường ngoài)"
+     ]
+    ],
+    "rooms_sum": 1.9,
+    "svg_kb": 76
+   },
+   "2": {
+    "area_table": 83.3,
+    "labels": [
+     "WC",
+     "BẾP & ĂN",
+     "P.KHÁCH"
+    ],
+    "rooms_ok": [],
+    "rooms_skipped": [
+     [
+      "WC + BẾP & ĂN + P.KHÁCH",
+      "vùng loang chạm mép khung (hở tường ngoài)"
+     ]
+    ],
+    "rooms_sum": 0,
+    "svg_kb": 287
+   },
+   "3": {
+    "area_table": 95.7,
+    "labels": [
+     "WC",
+     "WC",
+     "P. NGỦ",
+     "P. NGỦ"
+    ],
+    "rooms_ok": [],
+    "rooms_skipped": [
+     [
+      "WC + WC + P. NGỦ + P. NGỦ",
+      "vùng loang chạm mép khung (hở tường ngoài)"
+     ]
+    ],
+    "rooms_sum": 0,
+    "svg_kb": 135
+   },
+   "4": {
+    "area_table": 89.5,
+    "labels": [
+     "WC",
+     "P. NGỦ",
+     "WC",
+     "P. NGỦ"
+    ],
+    "rooms_ok": [],
+    "rooms_skipped": [
+     [
+      "WC + P. NGỦ + WC + P. NGỦ",
+      "vùng loang chạm mép khung (hở tường ngoài)"
+     ]
+    ],
+    "rooms_sum": 0,
+    "svg_kb": 139
+   },
+   "TUM": {
+    "area_table": 77.5,
+    "labels": [
+     "SÂN KT",
+     "P. ĐA NĂNG"
+    ],
+    "rooms_ok": [],
+    "rooms_skipped": [
+     [
+      "SÂN KT + P. ĐA NĂNG",
+      "vùng loang chạm mép khung (hở tường ngoài)"
+     ]
+    ],
+    "rooms_sum": 0,
+    "svg_kb": 321
+   }
+  },
+  "issues": [],
+  "calibration": {
+   "lot_bbox_pt": [
+    134.2,
+    173.7,
+    212.4,
+    457.6
+   ],
+   "k_from_width": 14.217,
+   "k_from_length": 14.191,
+   "diff_pct": 0.18,
+   "k_pt_per_m": 14.204
+  }
+ }
+}

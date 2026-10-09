@@ -10,6 +10,7 @@ Sơ đồ tương tác phân khu Vịnh Xanh, Ocean Park 3. Mở `vinh-xanh/ban-
 |---|---|
 | `ban-do-vinh-xanh.html` | Bản đồ đã dựng, một file tự chứa (ảnh nền, dữ liệu, mặt bằng mẫu nhà nhúng sẵn) |
 | `build/` | `v3.py` ghép `template2.html` + `lots.json` + `base.jpg` + `pdf/fp_*.jpg` thành file HTML |
+| `floorplan/` | Dựng lại mặt bằng 7 mẫu nhà từ PDF vector của CĐT thành SVG/DXF (`extract.py`), trang xem cho kỹ sư (`build_viewer.py` ra `viewer.html`). `data/` là đầu vào của `build/v3.py` |
 | `pipeline/` | Các bước dựng khung lô từ tổng mặt bằng CĐT, `data/` là kết quả trung gian |
 | `source/` | Tổng mặt bằng phân khu Vịnh Xanh của chủ đầu tư (8000 px) |
 | `qa/` | Script Playwright kiểm tra chạm lô trên máy tính và điện thoại |
@@ -20,6 +21,16 @@ Sơ đồ tương tác phân khu Vịnh Xanh, Ocean Park 3. Mở `vinh-xanh/ban-
 ```bash
 cd vinh-xanh/build && python3 v3.py        # ra ban-do-vinh-xanh.html
 ```
+
+### Dựng lại mặt bằng mẫu nhà
+
+```bash
+cd vinh-xanh/floorplan
+PYTHONUTF8=1 python extract.py <thư mục chứa các PDF HL-*.pdf> [--dxf]   # cần pymupdf, numpy, opencv-python-headless (và ezdxf nếu --dxf)
+PYTHONUTF8=1 python build_viewer.py                                      # ra viewer.html
+```
+
+`extract.py` hiệu chỉnh tỉ lệ bằng ranh đất và đối chiếu diện tích từng tầng với bảng của CĐT; kết quả kiểm tra nằm ở `report.json`. Sau đó dựng lại bản đồ như bên dưới.
 
 ### Dựng lại khung lô từ tổng mặt bằng
 
