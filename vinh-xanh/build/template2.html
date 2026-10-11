@@ -5,29 +5,15 @@
 <style>
 /* Layout: full-screen site plan; header with legend, map canvas, lot card docked right on desktop and as a bottom sheet on phones */
 :root{
-  --bg:#faf7f2; --surface:#ffffff; --fg:#2a2420; --muted:#7d7168; --line:#ece5db;
+  --bg:#ffffff; --surface:#ffffff; --fg:#2a2420; --muted:#7d7168; --line:#ece5db;
   --accent:#2a2420; --accent-ink:#ffffff; --accent-2:#e0245e; --focus:#e0245e;
   --hero-a:#ff8a5b; --hero-b:#e0245e; --hero-ink:#ffffff;
-  --land:#efeae1; --label-halo:rgba(40,28,20,.82); --label-ink:#ffffff; --lotline:#ffffff;
+  --land:#ffffff; --label-halo:rgba(40,28,20,.82); --label-ink:#ffffff; --lotline:#ffffff;
   --t-sl:#34d27b; --t-xk:#ffd21f; --t-dl:#ff9a3c; --t-sh:#a66bff;
   --font-ui:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --font-data:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
   --shadow:0 12px 32px rgba(60,40,20,.14);
 }
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#1b1714; --surface:#26211d; --fg:#f5efe8; --muted:#b3a69a; --line:#3a332d;
-  --accent:#f5efe8; --accent-ink:#1b1714; --accent-2:#ff5c8a; --focus:#ff5c8a;
-  --hero-a:#e8683a; --hero-b:#c01d4f; --hero-ink:#ffffff;
-  --land:#221d19; --label-halo:rgba(20,12,8,.85); --label-ink:#ffffff; --lotline:#ffffff;
-  --t-sl:#34d27b; --t-xk:#ffd21f; --t-dl:#ff9a3c; --t-sh:#a66bff;
-  --shadow:0 12px 32px rgba(0,0,0,.5); color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#1b1714; --surface:#26211d; --fg:#f5efe8; --muted:#b3a69a; --line:#3a332d;
-  --accent:#f5efe8; --accent-ink:#1b1714; --accent-2:#ff5c8a; --focus:#ff5c8a;
-  --hero-a:#e8683a; --hero-b:#c01d4f; --hero-ink:#ffffff;
-  --land:#221d19; --label-halo:rgba(20,12,8,.85); --label-ink:#ffffff; --lotline:#ffffff;
-  --t-sl:#34d27b; --t-xk:#ffd21f; --t-dl:#ff9a3c; --t-sh:#a66bff;
-  --shadow:0 12px 32px rgba(0,0,0,.5); color-scheme:dark}
 html,body{height:100%}
 body{background:var(--bg);color:var(--fg);font-family:var(--font-ui);font-size:14px;line-height:1.45;margin:0;overflow:hidden}
 .app{height:100%;display:grid;grid-template-rows:auto minmax(0,1fr);grid-template-columns:minmax(0,1fr)}
