@@ -37,11 +37,13 @@ R("function home(){","""const POLICY=`<div class="pol"><div class="eyebrow">Chí
 <tr><td>T + 30 ngày (gồm cọc)</td><td>15%</td></tr><tr><td>T + 60 / 90 ngày</td><td>5% mỗi đợt</td></tr><tr><td>T + 130 ngày</td><td>25%</td></tr><tr><td>T + 180 / 240 / 300 ngày</td><td>5% mỗi đợt</td></tr><tr><td>T + 360 ngày</td><td>10%</td></tr><tr><td>T + 390 ngày, kèm 100% phí bảo trì</td><td>25%</td></tr></tbody></table></div></details>
 <p class="note">Tóm tắt từ chính sách bán hàng Vịnh Xanh bản V10 hiệu lực từ 05/10/2026. Điều kiện chi tiết theo chính sách và hợp đồng.</p></div>`;
 function layoutBlock(l,s){
-  if(s&&s.type==='xe_khe')return '';
-  const out=[];const keys=[];if(l.lay)keys.push(l.lay);if(l.pair)keys.push('SL2-01G');
-  keys.forEach(k=>{const L=LAY[k];if(!L)return;
+  const out=[];const keys=[];if(l.lay)keys.push(l.lay);if(s&&s.type==='xe_khe')keys.push('LK1');if(l.pair)keys.push('SL2-01G');
+  keys.forEach(k=>{let L=LAY[k];if(!L)return;
+    const xk=s&&s.type==='xe_khe'&&k==='LK1';
+    if(xk){const r=s.build/L.total;const f=L.f.slice(0,4).map(v=>Math.round(v*r*10)/10);f.push(Math.round((s.build-f.reduce((a,b)=>a+b,0))*10)/10);
+      L={...L,f,total:s.build,land:s.size+' ('+s.land+' m²)',note:'Căn xẻ khe: dùng mẫu liền kề LK1, diện tích từng tầng quy đổi theo tổng diện tích xây dựng '+String(s.build).replace('.',',')+' m² trong bảng hàng. Hình mặt bằng mang tính minh họa.'}}
     const floors=L.f.map((v,i)=>`<div>${['Tầng 1','Tầng 2','Tầng 3','Tầng 4','Tầng tum'][i]}</div><div class="v">${v.toLocaleString('vi-VN')} m²</div>`).join('');
-    out.push(`<div class="lay"><div class="eyebrow">${k==='SL2-01G'?'Phương án ghép 2 căn':'Mẫu nhà áp dụng cho căn này'}</div>
+    out.push(`<div class="lay"><div class="eyebrow">${k==='SL2-01G'?'Phương án ghép 2 căn':xk?'Mẫu liền kề áp dụng cho căn xẻ khe':'Mẫu nhà áp dụng cho căn này'}</div>
     <h3>Mẫu ${L.code} · ${L.name}</h3>
     <button class="fpbtn" data-fp="${k}" aria-label="Xem mặt bằng mẫu ${L.code}"><img src="${L.img}" alt="Mặt bằng các tầng mẫu ${L.code}" loading="lazy"><span>Chạm để xem lớn</span></button>
     <div class="price"><div class="total">Tổng diện tích sàn</div><div class="v total">${L.total.toLocaleString('vi-VN')} m²</div>${floors}<div>Kích thước đất</div><div class="v">${L.land}</div></div>
