@@ -190,6 +190,10 @@ const SALE={
  'VX3-52':{type:'song_lap',dir:'Đông Nam',size:'8 × 18 m',land:144,build:294.5,total:20473235785,tts:16.989,h18:19.321,h24:20.243,h30:21.165,h36:22.189,gift:GIFT,bank:'VPBank'},
  'VX5-124':{type:'song_lap',dir:'Đông Nam',size:'8 × 18 m',land:144,build:294.5,total:20395531823,tts:16.921,h18:19.244,h24:20.162,h30:21.081,h36:22.101,gift:null,bank:'VPBank'},
  'VX5-126':{type:'song_lap',dir:'Đông Nam',size:'8 × 18 m',land:144,build:294.5,total:20395531823,tts:16.921,h18:19.244,h24:20.162,h30:21.081,h36:22.101,gift:GIFT,bank:'VPBank'},
+ 'VX2-87':{type:'xe_khe',dir:'Tây Bắc',size:'7 × 18 m',land:126,build:339.1,total:19321043541,tts:17.102,h18:17.990,h24:null,h30:null,h36:null,gift:null,bank:'VPBank',src:'Giá theo bảng hàng 19/10/2026'},
+ 'VX1-37':{type:'song_lap',dir:'Tây Bắc',size:'7 × 18 m',land:126,build:249.4,total:20814111991,tts:18.471,h18:19.382,h24:null,h30:null,h36:null,gift:null,bank:'VPBank',src:'Giá theo bảng hàng 19/10/2026'},
+ 'VX3-38':{type:'song_lap',dir:'Đông Nam',size:'8 × 18 m',land:144,build:294.5,total:22238017112,tts:19.685,h18:20.707,h24:null,h30:null,h36:null,gift:null,bank:'VPBank',src:'Giá theo bảng hàng 19/10/2026'},
+ 'VX4-104':{type:'song_lap',dir:'Tây Nam',size:'8 × 18 m',land:144,build:294.5,total:22411755839,tts:19.839,h18:20.868,h24:null,h30:null,h36:null,gift:null,bank:'VPBank',src:'Giá theo bảng hàng 19/10/2026'},
  'VX3-87':{type:'don_lap',dir:'Đông Bắc, Tây Bắc (lô góc)',size:'Lô góc',land:257.5,build:433.3,total:46467762362,tts:39.341,h18:44.730,h24:46.818,h30:48.907,h36:51.228,gift:null,bank:'VPBank'}
 };
 const NS='http://www.w3.org/2000/svg';
@@ -226,7 +230,7 @@ LOTS.forEach(l=>{
   nodes.set(l.id,p);
 });
 const centroid=l=>{let x=0,y=0;l.p.forEach(q=>{x+=q[0];y+=q[1]});return[x/l.p.length,y/l.p.length]};
-const CO={'VX3-87':[413,232],'VX3-52':[587,232],'VX2-19':[757,296],'VX5-124':[188,240],'VX5-126':[188,352]};
+const CO={'VX3-87':[401,284,124],'VX3-52':[546,341],'VX2-19':[692,400],'VX5-124':[133,342],'VX5-126':[128,400],'VX2-87':[261,283,8],'VX1-37':[340,342,124],'VX3-38':[552,400],'VX4-104':[302,400]};
 /* ---------- tiện ích công viên: vùng chạm đặt đúng lên số in sẵn trong ảnh nền ---------- */
 const AM={'1':'Artwork điểm nhấn','2':'Sân quảng trường','3':'Bãi cỏ ven hồ ngắm cảnh','4':'Thác tràn','5':'Hồ cá Koi','6':'Cầu cảnh quan','7':'Suối cạn, sỏi massage','8':'Vườn hoa Phong linh','9':'Vườn BBQ','10':'Đường chạy bộ sắc màu','11':'Sân bóng chuyền hơi','12':'Sân Pickleball','13':'Sân Tennis','14':'Sân bóng rổ tập ném','15':'Khu vui chơi trẻ em','16':'Artwork tượng','17':'Vườn xích đu','18':'Vườn Gyms','19':'Vườn cờ','20':'Vườn Yoga','21':'Sàn gỗ ngắm cảnh','22':'Giàn hoa','A':'Cổng vào kết hợp biển tên','B':'Artwork Hươu trang trí','C':'Sàn gỗ ven hồ cá Koi','D':'Chòi vọng cảnh điểm nhấn','TBA':'Trạm biến áp','BTS':'Trạm BTS','WC':'Nhà vệ sinh','NG':'Bể ngầm','LV':'Lối vào công viên'};
 /* toạ độ trong ảnh nền cắt (x, y), đổi sang toạ độ bản đồ ở bên dưới */
@@ -247,8 +251,8 @@ function clearAmenity(){if(amSel)amSel.classList.remove('sel');amSel=null;amTip.
 const GL=el('g');const PG=el('g');
 LOTS.filter(l=>l.code).forEach(l=>{
   el('path',{d:'M'+l.p.map(q=>q.join(' ')).join(' L')+' Z',class:'glow'},GL);
-  const s=SALE[l.code],[bx,by]=CO[l.code],W=132,H=50,[cx,cy]=centroid(l);
-  const ax=Math.max(bx,Math.min(bx+W,cx)),ay=cy<by?by:by+H;
+  const s=SALE[l.code],[bx,by,ba]=CO[l.code],W=132,H=50,[cx,cy]=centroid(l);
+  const ax=ba==null?Math.max(bx,Math.min(bx+W,cx)):bx+ba,ay=cy<by?by:by+H;
   el('path',{d:`M${ax} ${ay} L${cx} ${cy}`,class:'leader','data-for':l.id},PG);
   el('circle',{cx,cy,r:2.6,class:'dot','data-for':l.id},PG);
   const g=el('g',{class:'co','data-id':l.id,'data-for':l.id,transform:`translate(${bx} ${by})`},PG);
@@ -397,14 +401,14 @@ function select(id){
     <dt>Mặt đường</dt><dd>${esc(l.s)}</dd>${SPEC[l.t]&&!(s&&s.type==='xe_khe')?`<dt>Tầng cao</dt><dd>${SPEC[l.t].fl}</dd><dt>Mật độ xây dựng</dt><dd>${SPEC[l.t].dens}</dd>`:''}
     ${s?`<dt>Kích thước đất</dt><dd>${esc(s.size)}</dd><dt>Diện tích đất</dt><dd>${s.land.toLocaleString('vi-VN')} m²</dd><dt>Diện tích xây dựng</dt><dd>${s.build.toLocaleString('vi-VN')} m²</dd><dt>Hiện trạng bàn giao</dt><dd>Thô</dd>`:`<dt>Kích thước</dt><dd>${T.size}</dd><dt>Tình trạng</dt><dd>Liên hệ để kiểm tra</dd>`}
   </dl></details>`;
-  if(s){body+=`<details class="more"><summary>Giá theo bảng hàng 03/09/2026 (CSBH 13/8, đã cũ)</summary><div class="price">
+  if(s){body+=`<details class="more"><summary>${s.src||'Giá theo bảng hàng 03/09/2026 (CSBH 13/8, đã cũ)'}</summary><div class="price">
     <div class="total">Tổng giá niêm yết</div><div class="v total">${fmtFull(s.total)}</div>
     <div>Thanh toán sớm</div><div class="v">${fmtTy(s.tts)}</div>
     <div>Hỗ trợ lãi suất 18 tháng</div><div class="v">${fmtTy(s.h18)}</div>
-    <div>Hỗ trợ lãi suất 24 tháng</div><div class="v">${fmtTy(s.h24)}</div>
-    <div>Hỗ trợ lãi suất 30 tháng</div><div class="v">${fmtTy(s.h30)}</div>
-    <div>Hỗ trợ lãi suất 36 tháng</div><div class="v">${fmtTy(s.h36)}</div></div></details>
-    <dl class="spec"><dt>Ngân hàng hỗ trợ vay</dt><dd>${s.bank}</dd>${s.gift?`<dt>Quà tặng</dt><dd>${s.gift}</dd>`:''}</dl>`}
+    ${s.h24!=null?`<div>Hỗ trợ lãi suất 24 tháng</div><div class="v">${fmtTy(s.h24)}</div>`:''}
+    ${s.h30!=null?`<div>Hỗ trợ lãi suất 30 tháng</div><div class="v">${fmtTy(s.h30)}</div>`:''}
+    ${s.h36!=null?`<div>Hỗ trợ lãi suất 36 tháng</div><div class="v">${fmtTy(s.h36)}</div>`:''}</div></details>
+    <dl class="spec">${s.bank?`<dt>Ngân hàng hỗ trợ vay</dt><dd>${s.bank}</dd>`:''}${s.gift?`<dt>Quà tặng</dt><dd>${s.gift}</dd>`:''}</dl>`}
   else body+=`${SPEC[l.t]?`<div class="price"><div>Diện tích đất loại hình này</div><div class="v">${SPEC[l.t].land}</div><div>Giá tham khảo loại hình</div><div class="v">${SPEC[l.t].price}</div></div>`:''}<p class="note" style="margin:0">Mã căn và diện tích theo tổng mặt bằng của chủ đầu tư. Giá và tình trạng của căn sẽ được chuyên viên tư vấn gửi theo bảng hàng mới nhất; khoảng giá theo loại hình chỉ để tham khảo.</p>`;
   const hero=s?`<div class="hero"><div class="hs">Giá niêm yết · gồm VAT, chưa gồm KPBT</div><div class="hp">${fmtFull(s.total)}</div><div class="hs">${s.land.toLocaleString('vi-VN')} m² đất · ${s.build.toLocaleString('vi-VN')} m² xây · ${esc(s.dir.replace(' (lô góc)',''))}</div></div>`:`<div class="hero"><div class="hs">${l.dt?l.dt.toLocaleString('vi-VN')+' m² đất · ':''}Liên hệ để biết giá và tình trạng</div></div>`;
   panel.innerHTML=`<div class="card-h"><div><div class="eyebrow">${s?'Đang mở bán':'Lô trong phân khu'}</div><h2>${s?`<span class="code">${l.code}</span>`:l.no?`<span class="code">${l.no}</span>`:T.name}</h2>${!s&&l.no?`<div class="note">${T.name}</div>`:''}</div><button class="close" id="back" aria-label="Quay lại danh sách" title="Quay lại danh sách">←</button></div>

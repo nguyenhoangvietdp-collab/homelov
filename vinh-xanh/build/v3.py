@@ -37,7 +37,7 @@ R("function home(){","""const POLICY=`<div class="pol"><div class="eyebrow">Chí
 <tr><td>T + 30 ngày (gồm cọc)</td><td>15%</td></tr><tr><td>T + 60 / 90 ngày</td><td>5% mỗi đợt</td></tr><tr><td>T + 130 ngày</td><td>25%</td></tr><tr><td>T + 180 / 240 / 300 ngày</td><td>5% mỗi đợt</td></tr><tr><td>T + 360 ngày</td><td>10%</td></tr><tr><td>T + 390 ngày, kèm 100% phí bảo trì</td><td>25%</td></tr></tbody></table></div></details>
 <p class="note">Tóm tắt từ chính sách bán hàng Vịnh Xanh bản V10 hiệu lực từ 05/10/2026. Điều kiện chi tiết theo chính sách và hợp đồng.</p></div>`;
 function layoutBlock(l,s){
-  if(s&&l.code==='VX2-19')return '';
+  if(s&&s.type==='xe_khe')return '';
   const out=[];const keys=[];if(l.lay)keys.push(l.lay);if(l.pair)keys.push('SL2-01G');
   keys.forEach(k=>{const L=LAY[k];if(!L)return;
     const floors=L.f.map((v,i)=>`<div>${['Tầng 1','Tầng 2','Tầng 3','Tầng 4','Tầng tum'][i]}</div><div class="v">${v.toLocaleString('vi-VN')} m²</div>`).join('');
