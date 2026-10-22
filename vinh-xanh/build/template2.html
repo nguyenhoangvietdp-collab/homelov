@@ -29,7 +29,7 @@ header{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:10px 
 .chip.sale[aria-pressed="false"]{opacity:1}
 .chip.sale[aria-pressed="true"]{background:var(--surface);color:var(--accent-2);outline:0}
 .search{display:flex;gap:6px}
-.search input{width:130px;padding:7px 12px;border:1px solid var(--line);border-radius:999px;background:var(--bg);color:var(--fg);font:500 13px var(--font-data);text-transform:uppercase}
+.search input{width:150px;padding:7px 12px;border:1px solid var(--line);border-radius:999px;background:var(--bg);color:var(--fg);font:500 13px var(--font-data);text-transform:uppercase}
 .search input::placeholder{text-transform:none;font-family:var(--font-ui);color:var(--muted)}
 button:focus-visible,input:focus-visible,.lot:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
 .mapwrap{position:relative;min-width:0;min-height:0;overflow:hidden;background:var(--land)}
@@ -129,6 +129,12 @@ dl.spec dd{text-align:right;font-weight:600;font-variant-numeric:tabular-nums;mi
 .hero .hs{color:var(--muted);font-size:13px}
 .hint{transition:opacity .4s}.hint.gone{opacity:0;pointer-events:none}
 .foot{margin-top:auto;padding:12px 18px 18px;font-size:11.5px;color:var(--muted);border-top:1px solid var(--line)}
+@media (min-width:821px){
+  aside.center{top:50%;left:50%;right:auto;width:475px;max-width:calc(100% - 32px);max-height:calc(100% - 48px);transform:translate(-50%,-50%) scale(.97);opacity:0;transition:transform .2s ease,opacity .2s ease,visibility 0s .2s}
+  aside.center.open{transform:translate(-50%,-50%);opacity:1;transition:transform .2s ease,opacity .2s ease}
+  #scrim{position:fixed;inset:0;z-index:19;background:rgba(20,20,30,.28);opacity:0;visibility:hidden;transition:opacity .2s,visibility 0s .2s}
+  #scrim.on{opacity:1;visibility:visible;transition:opacity .2s}
+}
 @media (max-width:820px){
   .app{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)}
   header{padding:10px 16px;gap:8px}
@@ -162,6 +168,7 @@ dl.spec dd{text-align:right;font-weight:600;font-variant-numeric:tabular-nums;mi
     </div>
     <div class="hint">Kéo để di chuyển, cuộn hoặc chụm hai ngón để phóng to. Chạm vào một lô hoặc một số trong công viên để xem thông tin.</div>
   </div>
+  <div id="scrim"></div>
   <aside id="aside">
     <div class="pophead"><b id="grabTxt">Quỹ căn đang mở bán</b><button id="popClose" aria-label="Đóng cửa sổ">✕</button></div>
     <div class="panel" id="panel"></div>
@@ -298,7 +305,7 @@ function zoomAt(f,sx,sy){const base=fitVB();const nw=Math.min(base.w,Math.max(ba
 let anim;function animateTo(t){cancelAnimationFrame(anim);const s={...vb},t0=performance.now(),D=matchMedia('(prefers-reduced-motion:reduce)').matches?0:380;
   const step=n=>{const k=D?Math.min(1,(n-t0)/D):1,e=1-Math.pow(1-k,3);vb={x:s.x+(t.x-s.x)*e,y:s.y+(t.y-s.y)*e,w:s.w+(t.w-s.w)*e,h:s.h+(t.h-s.h)*e};setVB();if(k<1)anim=requestAnimationFrame(step)};anim=requestAnimationFrame(step)}
 function focusLot(l){const base=fitVB();const[x,y]=centroid(l);const w=Math.min(vb.w,base.w/2.6),h=w*base.h/base.w;
-  const mobile=matchMedia('(max-width:820px)').matches;const dx=mobile?0:(412/2)/svg.getBoundingClientRect().width*w;animateTo({x:x-w/2+dx,y:y-h*(mobile?0.32:0.5),w,h})}
+  const mobile=matchMedia('(max-width:820px)').matches;const dx=0;animateTo({x:x-w/2+dx,y:y-h*(mobile?0.32:0.5),w,h})}
 const ptrs=new Map();let drag=null,moved=0,pinch=null;
 svg.addEventListener('pointerdown',e=>{try{svg.setPointerCapture(e.pointerId)}catch(_){}ptrs.set(e.pointerId,[e.clientX,e.clientY]);moved=0;
   if(ptrs.size===1)drag={x:e.clientX,y:e.clientY,vb:{...vb},target:e.target};
@@ -331,7 +338,7 @@ ${['don_lap','song_lap','lien_ke','shophouse'].map(k=>`<tr><td><b>${TYPES[k].sho
 <details><summary>Tiện ích nội khu (công viên trung tâm)</summary><p class="note" style="margin:4px 0">Số trên bản đồ công viên ứng với danh mục dưới đây. Tam giác cam là lối vào công viên.</p><ol class="amen"><li><b class="code">1</b> Artwork điểm nhấn</li><li><b class="code">2</b> Sân quảng trường</li><li><b class="code">3</b> Bãi cỏ ven hồ ngắm cảnh</li><li><b class="code">4</b> Thác tràn</li><li><b class="code">5</b> Hồ cá Koi</li><li><b class="code">6</b> Cầu cảnh quan</li><li><b class="code">7</b> Suối cạn, sỏi massage</li><li><b class="code">8</b> Vườn hoa Phong linh</li><li><b class="code">9</b> Vườn BBQ</li><li><b class="code">10</b> Đường chạy bộ sắc màu</li><li><b class="code">11</b> Sân bóng chuyền hơi</li><li><b class="code">12</b> Sân Pickleball</li><li><b class="code">13</b> Sân Tennis</li><li><b class="code">14</b> Sân bóng rổ tập ném</li><li><b class="code">15</b> Khu vui chơi trẻ em</li><li><b class="code">16</b> Artwork tượng</li><li><b class="code">17</b> Vườn xích đu</li><li><b class="code">18</b> Vườn Gyms</li><li><b class="code">19</b> Vườn cờ</li><li><b class="code">20</b> Vườn Yoga</li><li><b class="code">21</b> Sàn gỗ ngắm cảnh</li><li><b class="code">22</b> Giàn hoa</li><li><b class="code">23</b> Chòi nghỉ</li><li><b class="code">24</b> Nhà Gym, Locker</li><li><b class="code">A</b> Cổng vào kết hợp biển tên</li><li><b class="code">B</b> Artwork Hươu trang trí</li><li><b class="code">C</b> Sàn gỗ ven hồ cá Koi</li><li><b class="code">D</b> Chòi vọng cảnh điểm nhấn</li></ol><p class="note">Hạ tầng kỹ thuật: Trạm bơm chống ngập, Trạm BTS, Trạm biến áp, Nhà vệ sinh, nhà phụ trợ, Nhà Gym, Bể ngầm.</p></details>
 <details><summary>Pháp lý và vị trí sản phẩm</summary><p>Sở hữu lâu dài (sổ đỏ). Dự kiến bàn giao quý III/2026.</p><p>Shophouse nằm dọc hai đại lộ; 100% lô có 2 mặt tiền trước sau, lô góc 3 mặt tiền; hơn 80% lô shophouse là loại 110 m². Liền kề nằm trên các trục Vịnh Xanh 2, 3, 4.</p></details>
 <p class="note">Mã căn, diện tích từng lô, lộ giới và danh mục tiện ích theo tổng mặt bằng của chủ đầu tư. Khoảng giá và mật độ xây dựng theo vinhomesland.vn, mang tính tham khảo. Chính sách bán hàng bên dưới theo văn bản của chủ đầu tư.</p></div>`;
-function home(){
+function home(){aside.classList.remove('center');document.getElementById('scrim').classList.remove('on');
   if(state.sel!=null)nodes.get(state.sel).classList.remove('sel');state.sel=null;
   const items=LOTS.filter(l=>l.code).map(l=>{const s=SALE[l.code];return`<button class="fitem" data-go="${l.id}"><span class="tag" style="background:${css(TYPES[s.type].v)}">${TYPES[s.type].short}</span><span><span class="code">${l.code}</span><small>Hướng ${esc(s.dir)} · ${s.land} m² đất</small></span><span class="p">${fmtFull(s.total)}</span></button>`}).join('');
   panel.innerHTML=`<div><div class="eyebrow">Quỹ căn đang mở bán</div><h2 style="margin:4px 0 0;font-size:20px;color:var(--accent)">${Object.keys(SALE).length} căn tại Vịnh Xanh</h2></div>
@@ -416,17 +423,21 @@ function select(id){
   document.getElementById('back').onclick=()=>{home();animateTo(startVB())};
   calcMount(l,s);
   document.getElementById('grabTxt').textContent=s?l.code:(l.no||T.name);
-  openPop();panel.scrollTop=0;aside.scrollTop=0;
+  aside.classList.add('center');scrim.classList.add('on');openPop();panel.scrollTop=0;aside.scrollTop=0;
   focusLot(l);
 }
 svg.addEventListener('pointerdown',()=>document.querySelector('.hint').classList.add('gone'),{once:true});
 function openPop(){aside.classList.add('open')}
-function closePop(){aside.classList.remove('open');if(state.sel!=null){nodes.get(state.sel).classList.remove('sel');state.sel=null}clearAmenity()}
+const scrim=document.getElementById('scrim');scrim.onclick=()=>closePop();
+function closePop(){scrim.classList.remove('on');aside.classList.remove('open');setTimeout(()=>{if(!aside.classList.contains('open'))aside.classList.remove('center')},220);if(state.sel!=null){nodes.get(state.sel).classList.remove('sel');state.sel=null}clearAmenity()}
 document.getElementById('popClose').onclick=closePop;
 document.getElementById('btnPop').onclick=()=>{if(aside.classList.contains('open')&&state.sel==null){closePop();return}home();openPop()};
 document.getElementById('searchForm').addEventListener('submit',e=>{e.preventDefault();const q=document.getElementById('q').value.trim().toUpperCase().replace(/\s/g,'');
   const l=LOTS.find(x=>x.code===q)||LOTS.find(x=>x.no===q)||LOTS.find(x=>x.no&&x.no.replace(/-0/,'-')===q.replace(/-0/,'-'));const i=document.getElementById('q');
   if(l){i.blur();select(l.id);i.setCustomValidity('')}else{i.setCustomValidity('Không tìm thấy mã căn này trên sơ đồ');i.reportValidity()}});
+if(!matchMedia('(max-width:820px)').matches)document.getElementById('q').placeholder='Mã căn · Ctrl+F';
+addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&!e.altKey&&e.key.toLowerCase()==='f'){e.preventDefault();const i=document.getElementById('q');i.focus();i.select()}
+  else if(e.key==='Escape'&&aside.classList.contains('open')&&document.activeElement!==document.getElementById('q'))closePop()});
 document.getElementById('q').addEventListener('input',e=>e.target.setCustomValidity(''));
 vb=startVB();setVB();home();
 </script>
