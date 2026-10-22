@@ -1,0 +1,116 @@
+<title>VX2-87 Mô hình 3D</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Bố cục: một khung 3D chiếm hết chiều cao, thanh điều khiển nằm dưới (điện thoại) hoặc bên phải (máy tính) */
+:root{--bg:#f5f3ef;--panel:#ffffff;--fg:#26211c;--muted:#7a7068;--line:#e4ded5;--accent:#c4452d;--wall:#efe7d9;--edge:#8a7d6c;--glass:#8fb8d6;--slab:#d9d3c8;
+  --font-ui:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",sans-serif;--font-data:"JetBrains Mono",ui-monospace,Menlo,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17191c;--panel:#1f2226;--fg:#ece8e1;--muted:#a09890;--line:#32363b;--accent:#ee7a62;--wall:#cdbfa8;--edge:#1b1a18;--glass:#6c97b8;--slab:#8d877d;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#17191c;--panel:#1f2226;--fg:#ece8e1;--muted:#a09890;--line:#32363b;--accent:#ee7a62;--wall:#cdbfa8;--edge:#1b1a18;--glass:#6c97b8;--slab:#8d877d;color-scheme:dark}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-ui);font-size:14px;line-height:1.45;padding-inline:max(16px,env(safe-area-inset-left,0px)) max(16px,env(safe-area-inset-right,0px));box-sizing:border-box}
+*{box-sizing:border-box}
+.app{height:100%;display:grid;grid-template-rows:auto minmax(0,1fr);gap:12px;padding-block:14px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 18px}
+h1{font-size:22px;margin:0;letter-spacing:-.01em}
+.facts{display:flex;flex-wrap:wrap;gap:4px 14px;color:var(--muted);font-size:13px}
+.facts b{color:var(--fg);font-weight:600;font-variant-numeric:tabular-nums}
+.main{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:14px;min-height:0}
+#view{position:relative;min-height:320px;border:1px solid var(--line);border-radius:14px;overflow:hidden;touch-action:none;background:linear-gradient(var(--bg),color-mix(in srgb,var(--line) 55%,var(--bg)))}
+#view canvas{display:block;width:100%;height:100%}
+.hint{position:absolute;left:12px;bottom:10px;font-size:12px;color:var(--muted);pointer-events:none}
+aside{display:flex;flex-direction:column;gap:14px;min-width:0;overflow:auto}
+section{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+h2{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin:0;font-weight:600}
+.row{display:flex;flex-wrap:wrap;gap:6px}
+button{font:600 13px var(--font-ui);padding:6px 11px;border:1px solid var(--line);border-radius:999px;background:var(--bg);color:var(--fg);cursor:pointer}
+button[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.fl{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px}
+.fl label{display:flex;align-items:center;gap:8px;cursor:pointer}
+.fl span.a{font-family:var(--font-data);font-size:12px;color:var(--muted)}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.note{font-size:12px;color:var(--muted);margin:0}
+@media (max-width:820px){.main{grid-template-columns:1fr;grid-template-rows:minmax(300px,56vh) auto}.app{height:auto;min-height:100%}aside{overflow:visible}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<div class="app">
+<header><h1>VX2-87</h1><div class="facts"><span>Liền kề xẻ khe · đất <b>126 m²</b></span><span>Sàn xây dựng <b>339,1 m²</b></span><span>Mô hình <b id="dim"></b></span></div></header>
+<div class="main">
+<div id="view" role="img" aria-label="Mô hình 3D năm tầng của căn VX2-87, kéo để xoay"><div class="hint">Kéo để xoay · cuộn hoặc chụm để phóng to</div></div>
+<aside>
+<section><h2>Tầng</h2><div id="fl" class="fl-list"></div></section>
+<section><h2>Tách tầng</h2><input type="range" id="ex" min="0" max="5" step="0.1" value="0" aria-label="Khoảng tách giữa các tầng"><div class="row"><label class="fl"><input type="checkbox" id="rf" checked> Mái</label><label class="fl"><input type="checkbox" id="gl" checked> Kính mặt tiền</label></div></section>
+<section><h2>Góc nhìn</h2><div class="row"><button data-v="front">Mặt tiền</button><button data-v="corner" aria-pressed="true">Góc chéo</button><button data-v="side">Bên hông</button><button data-v="top">Từ trên</button></div><div class="row"><button id="spin" aria-pressed="false">Tự xoay</button></div></section>
+<p class="note">Dựng từ tường và cột của mẫu liền kề LK1 (đất 5 × 18 m), chưa có bản vẽ riêng cho căn xẻ khe 7 × 18 m. Mô hình minh họa, chưa có cầu thang, cửa và nội thất.</p>
+</aside></div></div>
+<script>
+const D=__DATA__;
+const FL=[['1','Tầng 1',3.6,72.9],['2','Tầng 2',3.3,72.8],['3','Tầng 3',3.3,78.4],['4','Tầng 4',3.3,75.9],['TUM','Tầng tum',3.0,59.0]];
+const SC={'1':68.9,'2':68.8,'3':74.1,'4':71.7,'TUM':55.6};
+const SLAB=.15,fmt=n=>n.toLocaleString('vi-VN',{minimumFractionDigits:1,maximumFractionDigits:1});
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const W=5.0,DP=Math.max(...FL.map(f=>D[f[0]].size[1]));
+const view=document.getElementById('view');
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+view.appendChild(renderer.domElement);
+const scene=new THREE.Scene();
+const cam=new THREE.PerspectiveCamera(32,1,.1,300);
+const ctl=new THREE.OrbitControls(cam,renderer.domElement);ctl.enableDamping=true;ctl.dampingFactor=.08;ctl.maxPolarAngle=Math.PI/2.02;ctl.minDistance=6;ctl.maxDistance=90;
+scene.add(new THREE.HemisphereLight(0xffffff,0x8a8378,.95));
+const sun=new THREE.DirectionalLight(0xffffff,.85);sun.position.set(9,22,-12);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);
+Object.assign(sun.shadow.camera,{left:-16,right:16,top:16,bottom:-16,near:1,far:70});sun.shadow.bias=-.0004;scene.add(sun);
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(120,120),new THREE.ShadowMaterial({opacity:.18}));ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;scene.add(ground);
+const grid=new THREE.GridHelper(40,40,0x000000,0x000000);grid.material.transparent=true;grid.material.opacity=.07;scene.add(grid);
+const mats={};
+function paint(){const c=n=>new THREE.Color(css(n));
+  mats.wall=mats.wall||new THREE.MeshStandardMaterial({roughness:.9,side:THREE.DoubleSide});mats.wall.color=c('--wall');
+  mats.slab=mats.slab||new THREE.MeshStandardMaterial({roughness:.95});mats.slab.color=c('--slab');
+  mats.edge=mats.edge||new THREE.LineBasicMaterial();mats.edge.color=c('--edge');
+  mats.glass=mats.glass||new THREE.MeshPhysicalMaterial({transparent:true,opacity:.38,roughness:.1,side:THREE.DoubleSide,depthWrite:false});mats.glass.color=c('--glass')}
+paint();
+const groups=[];let base=0;
+const house=new THREE.Group();scene.add(house);
+FL.forEach(([k,name,h],i)=>{
+  const d=D[k],g=new THREE.Group();g.position.y=base;
+  d.shapes.forEach(s=>{
+    const pt=p=>new THREE.Vector2(p[0]-W/2,p[1]-DP/2);
+    const sh=new THREE.Shape(s.o.map(pt));s.h.forEach(hh=>sh.holes.push(new THREE.Path(hh.map(pt))));
+    const geo=new THREE.ExtrudeGeometry(sh,{depth:h,bevelEnabled:false});geo.rotateX(-Math.PI/2);
+    const m=new THREE.Mesh(geo,mats.wall);m.castShadow=m.receiveShadow=true;g.add(m);
+    g.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo,35),mats.edge));
+  });
+  const slab=new THREE.Mesh(new THREE.BoxGeometry(W+.3,SLAB,DP+.3),mats.slab);slab.position.set(0,-SLAB/2,0);slab.castShadow=slab.receiveShadow=true;g.add(slab);
+  const gz=new THREE.Group();gz.userData.glass=1;
+  [[-(d.size[1]-DP/2-.06)],[-(0-DP/2+.06)]].forEach(([z])=>{const p=new THREE.Mesh(new THREE.BoxGeometry(W-.35,h*.72,.03),mats.glass);p.position.set(0,h*.12+h*.36,z);gz.add(p)});
+  g.add(gz);
+  house.add(g);groups.push({k,g,h,i,base,glass:gz});base+=h+SLAB;
+});
+const TOP=base;
+const roof=new THREE.Mesh(new THREE.BoxGeometry(W+.7,.2,DP+.7),mats.slab);roof.position.set(0,TOP+.1-SLAB,0);roof.castShadow=true;house.add(roof);
+document.getElementById('dim').textContent=`${fmt(W)} × ${fmt(DP)} m · cao ${fmt(TOP)} m`;
+const flEl=document.getElementById('fl');
+groups.forEach(o=>{const [k,name]=FL[o.i];const l=document.createElement('div');l.className='fl';
+  l.innerHTML=`<label><input type="checkbox" checked data-k="${k}"> ${name}</label><span class="a">${fmt(SC[k])} m²</span>`;flEl.appendChild(l);
+  l.querySelector('input').onchange=e=>{o.g.visible=e.target.checked}});
+flEl.style.display='flex';flEl.style.flexDirection='column';flEl.style.gap='6px';
+const ex=document.getElementById('ex');function layout(){groups.forEach(o=>o.g.position.y=o.base+o.i*(+ex.value));roof.position.y=TOP+.1-SLAB+4*(+ex.value)+(+ex.value?0:0)}
+ex.oninput=layout;
+document.getElementById('rf').onchange=e=>{roof.visible=e.target.checked};
+document.getElementById('gl').onchange=e=>{groups.forEach(o=>o.glass.visible=e.target.checked)};
+const V={front:[0,TOP*.5,-TOP*2.7],corner:[TOP*1.15,TOP*.8,-TOP*2.1],side:[TOP*2.7,TOP*.5,0],top:[.01,TOP*3.1,.01]};
+let tween=null;
+function go(n){const to=new THREE.Vector3(...V[n]);const from=cam.position.clone(),t0=performance.now();tween=t=>{const u=Math.min(1,(t-t0)/600),e=u*u*(3-2*u);cam.position.lerpVectors(from,to,e);if(u>=1)tween=null}}
+document.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-v]').forEach(x=>x.setAttribute('aria-pressed',x===b));go(b.dataset.v)});
+const spin=document.getElementById('spin');spin.onclick=()=>{ctl.autoRotate=!ctl.autoRotate;ctl.autoRotateSpeed=1.4;spin.setAttribute('aria-pressed',ctl.autoRotate)};
+ctl.target.set(0,TOP*.45,0);cam.position.set(...V.corner);
+function size(){const r=view.getBoundingClientRect();renderer.setSize(r.width,r.height,false);cam.aspect=r.width/r.height;cam.updateProjectionMatrix()}
+new ResizeObserver(size).observe(view);size();
+matchMedia('(prefers-color-scheme:dark)').addEventListener('change',()=>setTimeout(paint,50));
+new MutationObserver(()=>paint()).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+const still=matchMedia('(prefers-reduced-motion:reduce)').matches;
+renderer.setAnimationLoop(t=>{tween&&tween(t);ctl.update();renderer.render(scene,cam)});
+window.__ready=true;
+</script>
