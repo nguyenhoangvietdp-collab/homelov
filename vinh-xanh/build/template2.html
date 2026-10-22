@@ -204,7 +204,7 @@ const SALE={
  'VX3-52':{type:'song_lap',dir:'Đông Nam',size:'8 × 18 m',land:144,build:294.5,total:20473235785,tts:16.989,h18:19.321,h24:20.243,h30:21.165,h36:22.189,gift:GIFT,bank:'VPBank'},
  'VX5-124':{type:'song_lap',dir:'Đông Nam',size:'8 × 18 m',land:144,build:294.5,total:20395531823,tts:16.921,h18:19.244,h24:20.162,h30:21.081,h36:22.101,gift:null,bank:'VPBank'},
  'VX5-126':{type:'song_lap',dir:'Đông Nam',size:'8 × 18 m',land:144,build:294.5,total:20395531823,tts:16.921,h18:19.244,h24:20.162,h30:21.081,h36:22.101,gift:GIFT,bank:'VPBank'},
- 'VX2-87':{type:'xe_khe',dir:'Tây Bắc',size:'7 × 18 m',land:126,build:339.1,total:19321043541,tts:17.102,h18:17.990,h24:null,h30:null,h36:null,gift:null,bank:'VPBank',src:'Giá theo bảng hàng 19/10/2026'},
+ 'VX2-87':{type:'xe_khe',dir:'Tây Bắc',size:'7 × 18 m',land:126,build:339.1,total:19321043541,tts:17.102,h18:17.990,h24:null,h30:null,h36:null,gift:null,bank:'VPBank',src:'Giá theo bảng hàng 19/10/2026',ptg:{F:19321043541,N0:17663297943,landPrice:15240893,land:126,kpbt:83451055}},
  'VX1-37':{type:'song_lap',dir:'Tây Bắc',size:'7 × 18 m',land:126,build:249.4,total:20814111991,tts:18.471,h18:19.382,h24:null,h30:null,h36:null,gift:null,bank:'VPBank',src:'Giá theo bảng hàng 19/10/2026'},
  'VX3-38':{type:'song_lap',dir:'Đông Nam',size:'8 × 18 m',land:144,build:294.5,total:22238017112,tts:19.685,h18:20.707,h24:null,h30:null,h36:null,gift:null,bank:'VPBank',src:'Giá theo bảng hàng 19/10/2026'},
  'VX4-104':{type:'song_lap',dir:'Tây Nam',size:'8 × 18 m',land:144,build:294.5,total:22411755839,tts:19.839,h18:20.868,h24:null,h30:null,h36:null,gift:null,bank:'VPBank',src:'Giá theo bảng hàng 19/10/2026'},
@@ -360,8 +360,46 @@ const fmtD=n=>Math.abs(n)>=1e9?(n/1e9).toLocaleString('vi-VN',{minimumFractionDi
 const fmtV=n=>Math.round(n).toLocaleString('vi-VN')+' đ';
 const PAYS=[['std','Tiến độ chuẩn (130 ngày)'],['relax','Tiến độ giãn (đến 31/10/2026)'],['tts','Thanh toán sớm trong 30 ngày, không vay'],['pa1','Vay 70% · hỗ trợ lãi suất PA1 (lãi cố định)'],['pa2','Vay 70% · hỗ trợ lãi suất PA2 (lãi 0%, cộng giá)']];
 const CLUBS=[['none','Không áp dụng'],['vc_gold','VinClub Vàng 1,0%'],['vc_plat','VinClub Bạch kim 1,3%'],['vc_dia','VinClub Kim cương 1,7%'],['sqt_member','Siêu quà tặng Member 1,0%'],['sqt_gold','Siêu quà tặng Vàng 3,0%'],['sqt_plat','Siêu quà tặng Bạch kim 3,9%'],['sqt_dia','Siêu quà tặng Kim cương 5,1%']];
-function calcBox(l,s){return s?`<div class="calc"><div class="eyebrow">Tính theo chính sách bán hàng ${CSBH.ver}</div><div class="cf" id="cctl"></div><div id="cres"></div></div>`:''}
-function calcMount(l,s){if(!s)return;const F=s.total;
+function calcBox(l,s){if(s&&s.ptg)return `<div class="calc"><div class="eyebrow">Phiếu tính giá tạm tính · CS 20/9 và ưu đãi đến 31/10/2026</div><div class="cf" id="cctl"></div><div id="cres"></div></div>`;return s?`<div class="calc"><div class="eyebrow">Tính theo chính sách bán hàng ${CSBH.ver}</div><div class="cf" id="cctl"></div><div id="cres"></div></div>`:''}
+const POPT={mode:'std',vos:true,blnh:true,date:COPT.date};
+const PMODES=[['std','Tiến độ chuẩn (130 ngày)'],['tts','Thanh toán sớm, không vay'],['loan','Vay 70% · hỗ trợ lãi 18 tháng, lãi 0%']];
+function ptgMount(l,s){
+  const ctl=document.getElementById('cctl'),res=document.getElementById('cres');
+  const row=(a,b,c)=>`<div class="crow ${c||''}"><span>${a}</span><span>${b}</span></div>`;
+  function renderRes(){const r=calcPTG(s.ptg,POPT);
+    let h=`<div class="cr"><div class="crow big"><span>Tổng giá sau chiết khấu</span><b title="${fmtV(r.final)}">${fmtD(r.final)}</b></div>
+      <div class="note" style="margin:-2px 0 4px">gồm VAT và KPBT, đã trừ tiền về ở sớm nhận sau · tiết kiệm ${fmtD(r.listed-r.final)} so với giá full</div>`;
+    h+=row('Giá full niêm yết (VAT + KPBT)',fmtD(r.listed));
+    h+=row('Giá trước VAT, trước giảm trừ',fmtD(r.N0));
+    if(r.mode==='loan')h+=row('Cộng vào giá do lãi 0% (18 tháng)','+3,5% · '+fmtD(r.N8-r.N0));
+    if(r.vosOn)h+=row('Về ở sớm: giảm vào giá 5%','− '+fmtD(r.vosDisc),'neg');
+    if(r.blnhOn)h+=row('Từ chối bảo lãnh ngân hàng: 0,5%','− '+fmtD(r.blnh),'neg');
+    if(r.tts)h+=row('Chiết khấu thanh toán sớm 13%/năm (trước VAT)','− '+fmtD(r.ttsEx),'neg');
+    h+=row('Giá trước VAT sau giảm trừ',fmtD(r.n));
+    h+=row('VAT 10% (không tính trên tiền đất)',fmtD(r.vat));
+    h+=row('Giá có VAT sau chiết khấu',fmtD(r.T));
+    h+=row('Phí bảo trì (KPBT)',fmtD(r.kpbt));
+    h+=row('<b>Giá sau chiết khấu, có VAT + KPBT</b>','<b>'+fmtD(r.gross)+'</b>');
+    if(r.vosOn)h+=row('Về ở sớm: 5% nhận tiền mặt (khách chịu TNCN)','− '+fmtD(r.vosCash),'neg');
+    h+=row('<b>Tổng giá sau chiết khấu (tạm tính)</b>','<b>'+fmtD(r.final)+'</b>');
+    if(r.mode==='loan'){h+=row('Ngân hàng giải ngân (70%)',fmtD(r.bank));h+=row('Vốn tự có (30% + KPBT)',fmtD(r.selfFund))}
+    h+='</div>'+r.warn.map(w=>`<div class="cwarn">${esc(w)}</div>`).join('');
+    const tr=r.rows.map(x=>`<tr><td>${x.day===0?'Đặt cọc':'T+'+x.day}</td><td>${x.pct==null?'':Math.round(x.pct*100)+'%'}</td><td>${fmtD(x.amt)}${x.kpbt?'<br><small class="note">+ KPBT '+fmtD(x.kpbt)+'</small>':''}</td></tr>`).join('')+(r.mode==='loan'?`<tr><td>Theo giải ngân</td><td>70%</td><td>${fmtD(r.bank)}<br><small class="note">ngân hàng giải ngân</small></td></tr>`:'');
+    h+=`<details class="more"><summary>Lịch thanh toán chi tiết</summary><table class="ctbl"><tr><th>Mốc</th><th>Tỷ lệ</th><th>Số tiền</th></tr>${tr}</table><p class="note">Đợt đầu đã trừ cọc 300 triệu đồng. Mốc T là ngày ký thỏa thuận đặt cọc.</p></details>`;
+    h+=`<p class="note">Tính theo bảng tính giá tạm tính của đại lý cho căn VX2-87. Chỉ mang tính tham khảo, không dùng làm căn cứ làm việc với chủ đầu tư. Lãi dòng tiền và các ưu đãi thay đổi hoặc không được áp dụng phụ thuộc vào ngày bàn giao của chủ đầu tư.</p>`;
+    res.innerHTML=h}
+  function renderCtl(){const dead=POPT.date>PTG.vosEnd;
+    ctl.innerHTML=`<label>Ngày ký đặt cọc<input type="date" id="p-date" value="${POPT.date}" min="${CSBH.from}"></label>
+      <label>Phương thức<select id="p-mode">${PMODES.map(([v,t])=>`<option value="${v}"${POPT.mode===v?' selected':''}>${t}</option>`).join('')}</select></label>
+      <label class="ck w"><input type="checkbox" id="p-vos" ${POPT.vos&&!dead?'checked':''} ${dead?'disabled':''}> Về ở sớm: 5% vào giá + 5% nhận tiền mặt (đến 31/10/2026)${dead?' · hết hạn':''}</label>
+      <label class="ck w"><input type="checkbox" id="p-blnh" ${POPT.blnh?'checked':''}> Từ chối bảo lãnh ngân hàng: chiết khấu 0,5%</label>`;
+    const g=id=>document.getElementById(id);
+    g('p-date').onchange=e=>{if(e.target.value&&e.target.value>=CSBH.from)POPT.date=e.target.value;renderCtl();renderRes()};
+    g('p-mode').onchange=e=>{POPT.mode=e.target.value;renderRes()};
+    g('p-vos').onchange=e=>{POPT.vos=e.target.checked;renderRes()};
+    g('p-blnh').onchange=e=>{POPT.blnh=e.target.checked;renderRes()}}
+  renderCtl();renderRes()}
+function calcMount(l,s){if(!s)return;if(s.ptg)return ptgMount(l,s);const F=s.total;
   const ctl=document.getElementById('cctl'),res=document.getElementById('cres');
   const loan=()=>COPT.pay==='pa1'||COPT.pay==='pa2';
   function renderRes(){const o={...COPT},r=calc(F,o);const row=(a,b,c)=>`<div class="crow ${c||''}"><span>${a}</span><span>${b}</span></div>`;
@@ -424,7 +462,7 @@ function select(id){
     ${s.h36!=null?`<div>Hỗ trợ lãi suất 36 tháng</div><div class="v">${fmtTy(s.h36)}</div>`:''}</div></details>
     <dl class="spec">${s.bank?`<dt>Ngân hàng hỗ trợ vay</dt><dd>${s.bank}</dd>`:''}${s.gift?`<dt>Quà tặng</dt><dd>${s.gift}</dd>`:''}</dl>`}
   else body+=`${SPEC[l.t]?`<div class="price"><div>Diện tích đất loại hình này</div><div class="v">${SPEC[l.t].land}</div><div>Giá tham khảo loại hình</div><div class="v">${SPEC[l.t].price}</div></div>`:''}<p class="note" style="margin:0">Mã căn và diện tích theo tổng mặt bằng của chủ đầu tư. Giá và tình trạng của căn sẽ được chuyên viên tư vấn gửi theo bảng hàng mới nhất; khoảng giá theo loại hình chỉ để tham khảo.</p>`;
-  const hero=s?`<div class="hero"><div class="hs">Giá niêm yết · gồm VAT, chưa gồm KPBT</div><div class="hp">${fmtFull(s.total)}</div><div class="hs">${s.land.toLocaleString('vi-VN')} m² đất · ${s.build.toLocaleString('vi-VN')} m² xây · ${esc(s.dir.replace(' (lô góc)',''))}</div></div>`:`<div class="hero"><div class="hs">${l.dt?l.dt.toLocaleString('vi-VN')+' m² đất · ':''}Liên hệ để biết giá và tình trạng</div></div>`;
+  const hero=s?`<div class="hero"><div class="hs">Giá niêm yết · ${s.ptg?'gồm VAT và KPBT':'gồm VAT, chưa gồm KPBT'}</div><div class="hp">${fmtFull(s.total)}</div><div class="hs">${s.land.toLocaleString('vi-VN')} m² đất · ${s.build.toLocaleString('vi-VN')} m² xây · ${esc(s.dir.replace(' (lô góc)',''))}</div></div>`:`<div class="hero"><div class="hs">${l.dt?l.dt.toLocaleString('vi-VN')+' m² đất · ':''}Liên hệ để biết giá và tình trạng</div></div>`;
   panel.innerHTML=`<div class="card-h"><div><div class="eyebrow">${s?'Đang mở bán':'Lô trong phân khu'}</div><h2>${s?`<span class="code">${l.code}</span>`:l.no?`<span class="code">${l.no}</span>`:T.name}</h2>${!s&&l.no?`<div class="note">${T.name}</div>`:''}</div><button class="close" id="back" aria-label="Quay lại danh sách" title="Quay lại danh sách">←</button></div>
     <div class="badges"><span class="tag" style="background:${css(T.v)}">${T.short}</span>${tr}</div>${hero}${calcBox(l,s)}${photo(l)}${body}`;
   document.getElementById('back').onclick=()=>{home();animateTo(startVB())};

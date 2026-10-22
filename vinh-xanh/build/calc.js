@@ -90,4 +90,49 @@ function calc(F, o) {
     vosRefund: vos ? Math.round(C.vosRate / 2 * N2) : 0
   };
 }
-if (typeof module !== 'undefined') module.exports = { calc, CSBH };
+
+/* Phiếu tính giá tạm tính (PTG) theo bảng tính của đại lý cho căn VX2-87, CS 20/9 + ưu đãi đến 31/10/2026.
+   Khác calc() ở chỗ: VAT chỉ tính trên phần không phải tiền đất; phí bảo trì lấy theo bảng hàng; thêm chiết khấu từ chối BLNH 0,5%;
+   chiết khấu thanh toán sớm quy thành lãi dòng tiền trừ vào giá trước VAT; ưu đãi về ở sớm 5% vào giá và 5% nhận tiền mặt khi hoàn thiện. */
+const PTG = {
+  vos: 0.05, vosCash: 0.05, blnh: 0.005, loanRatio: 0.70, loanAdd: 0.035, ttsDaily: Math.floor(0.13 / 365 * 1e7) / 1e7,
+  deposit: 300000000, vosEnd: '2026-10-31',
+  std: [[15, 0.20], [30, 0.20], [75, 0.20], [105, 0.15], [130, 0.25]]
+};
+function calcPTG(p, o) {
+  o = o || {};
+  const mode = o.mode || 'std';
+  const live = !o.date || o.date <= PTG.vosEnd;
+  const vosOn = !!o.vos && live, blnhOn = o.blnh !== false;
+  const N8 = p.N0 * (mode === 'loan' ? 1 + PTG.loanAdd : 1);
+  const vosDisc = vosOn ? N8 * PTG.vos : 0;
+  const blnh = blnhOn ? (N8 - vosDisc) * PTG.blnh : 0;
+  const landExempt = p.landPrice * p.land;
+  const price = (disc) => { const n = N8 - vosDisc - blnh - disc; const vat = (n - landExempt) * 0.10; return { n, vat, t: n + vat }; };
+  const base = price(0);                                 // giá sau ưu đãi, chưa trừ lãi thanh toán sớm
+  let tts = 0, ttsEx = 0;
+  if (mode === 'tts') {                                  // lãi dòng tiền tính trên các đợt chuẩn sau ngày T+30
+    PTG.std.forEach(([day, pct]) => { const d = day - 30; if (d > 0) tts += pct * base.t * (1 - 1 / Math.pow(1 + PTG.ttsDaily, d)); });
+    ttsEx = tts / 1.1;
+  }
+  const pr = price(ttsEx);
+  const T = pr.t, kpbt = p.kpbt;
+  const vosCash = vosOn ? (N8 - blnh - ttsEx) * PTG.vosCash : 0;
+  const rows = [{ day: 0, pct: null, amt: PTG.deposit, kpbt: 0, label: 'Đặt cọc' }];
+  let bank = 0;
+  if (mode === 'std') {
+    let acc = 0;
+    PTG.std.forEach(([day, pct], i) => { const last = i === PTG.std.length - 1; const a = last ? T - acc : pct * base.t; acc += a; rows.push({ day, pct, amt: i === 0 ? a - PTG.deposit : a, kpbt: last ? kpbt : 0 }); });
+  } else if (mode === 'tts') {
+    const a1 = 0.20 * T - PTG.deposit;
+    rows.push({ day: 15, pct: 0.20, amt: a1, kpbt: 0 }, { day: 25, pct: 0.80, amt: T - a1 - PTG.deposit, kpbt: kpbt });
+  } else {
+    bank = PTG.loanRatio * T;
+    rows.push({ day: 15, pct: 0.20, amt: 0.20 * T - PTG.deposit, kpbt: 0 }, { day: 30, pct: 0.10, amt: 0.10 * T, kpbt: kpbt });
+  }
+  const gross = T + kpbt;
+  return { mode, vosOn, blnhOn, listed: p.F, N0: p.N0, N8, vosDisc, blnh, ttsEx, tts, n: pr.n, vat: pr.vat, T, kpbt, gross,
+           vosCash, final: gross - vosCash, rows, bank, selfFund: gross - bank, live,
+           warn: o.vos && !live ? ['Ưu đãi về ở sớm đã hết hạn (đến 31/10/2026), bỏ qua.'] : [] };
+}
+if (typeof module !== 'undefined') module.exports = { calc, CSBH, calcPTG, PTG };
