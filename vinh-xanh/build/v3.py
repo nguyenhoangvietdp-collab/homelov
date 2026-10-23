@@ -76,7 +76,7 @@ function showPlan(k,D,fk){const o=document.getElementById('fp'),f=D.floors[fk];o
 function home(){""")
 R("const T=TYPES[l.t],s=l.code&&SALE[l.code];","const s=l.code&&SALE[l.code],T=TYPES[s?s.type:l.t];")
 R("`<dt>Kích thước</dt><dd>${T.size}</dd><dt>Tình trạng</dt><dd>Liên hệ để kiểm tra</dd>`","`${l.no?`<dt>Mã căn</dt><dd class=\"code\">${l.no}</dd>`:''}${l.dt?`<dt>Diện tích đất</dt><dd>${l.dt.toLocaleString('vi-VN')} m²</dd>`:''}<dt>Kích thước đất</dt><dd>${l.pair?'7 × 18 m':xk(l)?'7 × 18 m':l.lay&&LAY[l.lay]?LAY[l.lay].land:T.size}</dd>${l.pair?`<dt>Phương án ghép</dt><dd>${l.pair}</dd>`:''}<dt>Tình trạng</dt><dd>Liên hệ để kiểm tra</dd>`")
-R("${tr}</div>${hero}${calcBox(l,s)}${photo(l)}${body}`;","${tr}</div>${hero}${calcBox(l,s)}${photo(l)}${body}${layoutBlock(l,s)}`;\n  panel.querySelectorAll('[data-fp]').forEach(b=>b.onclick=()=>openFP(b.dataset.fp));")
+R("${tr}</div>${hero}${calcBox(l,s)}${photo(l)}${body}`;","${tr}</div>${hero}${calcBox(l,s)}${photo(l)}${body}${toolsBlock(l,s)}${layoutBlock(l,s)}`;\n  panel.querySelectorAll('[data-fp]').forEach(b=>b.onclick=()=>openFP(b.dataset.fp));panel.querySelectorAll('[data-vw]').forEach(b=>b.onclick=()=>vwOpen(l,s,b.dataset.vw));")
 # overlay html + css
 R('<div class="foot">','''<div class="foot">Mặt bằng mẫu nhà theo tài liệu của chủ đầu tư, chỉ mang tính tương đối và có thể điều chỉnh; cam kết chính thức theo hợp đồng mua bán. ''')
 R('</aside>','''</aside>
@@ -139,5 +139,5 @@ for k in LAY:
     assert got==LAY[k]['f'],(k,got,LAY[k]['f'])   # diện tích từng tầng đọc từ PDF phải khớp bảng đã có
     PL[k]={'order':d['order'],'floors':{x:{'name':f['name'],'area_m2':f['area_m2'],'box':f['box'],'svg':f['svg'],'labels':[{'n':l['n'],'x':l['x'],'y':l['y']} for l in f['labels']]} for x,f in d['floors'].items()}}
 PLANZ=base64.b64encode(gzip.compress(json.dumps(PL,ensure_ascii=False,separators=(',',':')).encode(),9)).decode()
-out=s.replace('__LOTS__',open('lots.json').read()).replace('__IMG__',img).replace('__LAY__',json.dumps(LAY,ensure_ascii=False)).replace('__PLANZ__',PLANZ).replace('/*__CALC__*/',open('calc.js',encoding='utf8').read())
+out=s.replace('__LOTS__',open('lots.json').read()).replace('__IMG__',img).replace('__LAY__',json.dumps(LAY,ensure_ascii=False)).replace('__PLANZ__',PLANZ).replace('__CAD3D__',open('cad3d.json',encoding='utf8').read()).replace('/*__CALC__*/',open('calc.js',encoding='utf8').read())
 open('ban-do-vinh-xanh.html','w').write(out)

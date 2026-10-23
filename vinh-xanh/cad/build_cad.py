@@ -56,3 +56,15 @@ if __name__ == '__main__':
     for k in floors:
         open(os.path.join(H, f'{CODE}_T{k.lower()}.svg' if k=='TUM' else f'{CODE}_T{k}.svg'), 'w', encoding='utf8').write(sheet(k))
     print({k: scaled[k] for k in floors}, sum(scaled.values()))
+
+def web_export(path):
+    """Dữ liệu cho website: bản vẽ từng tầng (chỉ phần mặt bằng, nét đen) + đa giác tường 3D -> build/cad3d.json"""
+    cad = {}
+    for k in floors:
+        f = D['floors'][k]; x, y, w, h = f['box']; pad = 8
+        labels = ''.join(f'<text x="{l["x"]:.1f}" y="{l["y"]:.1f}" text-anchor="middle" font-size="7" font-weight="700" font-family="DejaVu Sans,Arial,sans-serif">{html.escape(l["n"].upper())}</text>' for l in f['labels'])
+        cad[k] = {'vb': [round(x - pad, 1), round(y - pad, 1), round(w + 2 * pad, 1), round(h + 2 * pad, 1)], 'svg': bw(f['svg']) + labels,
+                  'name': NAMES[k].title(), 'tpl': f['area_m2'], 'area': scaled[k]}
+    walls = json.load(open(os.path.join(H, '..', '3d', 'walls3d.json')))
+    json.dump({'cad': cad, 'walls': walls, 'k': K}, open(path, 'w', encoding='utf8'), ensure_ascii=False, separators=(',', ':'))
+    print(path, os.path.getsize(path) // 1024, 'KB')
