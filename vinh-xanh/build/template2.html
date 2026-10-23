@@ -94,7 +94,7 @@ aside::-webkit-scrollbar-thumb:hover{background-color:rgba(90,80,70,.75)}
 .cr{display:flex;flex-direction:column;gap:2px}
 .crow{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px solid var(--line);font-size:13px}
 .crow span:first-child{color:var(--muted)}.crow b,.crow span:last-child{font-variant-numeric:tabular-nums;text-align:right}
-.crow.big{border:0;padding-top:2px}.crow.big b{font-size:24px;letter-spacing:-.02em;color:var(--accent-2)}.crow.big span:first-child{align-self:center}
+.crow.big{border:0;padding-top:2px}.crow.big b{font-size:30px;letter-spacing:-.02em;color:var(--accent-2)}.crow.big span:first-child{align-self:center}
 .crow.neg span:last-child{color:#1a8f4a}.crow.later{border-bottom:0;font-size:12px}.crow.later span:first-child{color:var(--muted)}
 .cwarn{font-size:12px;color:#b3550f;margin:2px 0}
 .ctbl{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:tabular-nums}.ctbl td,.ctbl th{padding:5px 4px;border-bottom:1px solid var(--line);text-align:left}.ctbl td:last-child,.ctbl th:last-child{text-align:right}.ctbl th{color:var(--muted);font-weight:600}
@@ -132,7 +132,8 @@ dl.spec dd{text-align:right;font-weight:600;font-variant-numeric:tabular-nums;mi
 .more[open]{padding-bottom:12px}
 .more .pol{border:0;padding:0;background:transparent}
 .hero{display:flex;flex-direction:column;gap:2px}
-.hero .hp{font:600 28px var(--font-ui);letter-spacing:-.02em;color:var(--accent-2)}
+.hero .hp{font:700 46px/1.05 var(--font-ui);letter-spacing:-.03em;color:var(--accent-2);font-variant-numeric:tabular-nums;margin:2px 0 4px}
+@media (max-width:820px){.hero .hp{font-size:40px}}
 .hero .hs{color:var(--muted);font-size:13px}
 .hint{transition:opacity .4s}.hint.gone{opacity:0;pointer-events:none}
 .foot{margin-top:auto;padding:12px 18px 18px;font-size:11.5px;color:var(--muted);border-top:1px solid var(--line)}
@@ -159,7 +160,7 @@ dl.spec dd{text-align:right;font-weight:600;font-variant-numeric:tabular-nums;mi
 .vwtools{display:flex;flex-direction:column;gap:8px;margin:14px 0}
 .vwbtns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .vwb{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--fg);cursor:pointer;font:inherit}
-.vwb b{font:600 13.5px var(--font-ui)}.vwb small{font-size:11.5px;color:var(--muted);line-height:1.3}.vwb:hover{border-color:var(--accent)}
+.vwb kbd{font:500 10.5px var(--font-data);color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:0 5px;margin-left:4px;vertical-align:1px}.vwb b{font:600 13.5px var(--font-ui)}.vwb small{font-size:11.5px;color:var(--muted);line-height:1.3}.vwb:hover{border-color:var(--accent)}
 .vw{position:fixed;inset:0;z-index:60;background:rgba(15,15,20,.55);display:flex;align-items:center;justify-content:center;padding:max(16px,env(safe-area-inset-top,0px)) 16px max(16px,env(safe-area-inset-bottom,0px))}
 .vw[hidden]{display:none}
 .vwp{width:min(1100px,100%);height:min(780px,100%);background:var(--surface);color:var(--fg);border:1px solid var(--line);border-radius:18px;box-shadow:0 24px 70px rgba(0,0,0,.35);display:flex;flex-direction:column;overflow:hidden}
@@ -441,8 +442,12 @@ const CAD3D=__CAD3D__;
 const VW_FLOORS=[['1','Tầng 1',3.6],['2','Tầng 2',3.3],['3','Tầng 3',3.3],['4','Tầng 4',3.3],['TUM','Tầng tum',3.0]];
 function vwAreas(s){const f=VW_FLOORS.map(([k])=>CAD3D.cad[k].tpl),t=f.reduce((a,b)=>a+b,0),o=f.slice(0,4).map(v=>Math.round(v*s.build/t*10)/10);o.push(Math.round((s.build-o.reduce((a,b)=>a+b,0))*10)/10);return o}
 function toolsBlock(l,s){if(!s||s.type!=='xe_khe')return '';
-  return `<div class="vwtools"><div class="eyebrow">Bản vẽ và mô hình</div><div class="vwbtns"><button class="vwb" data-vw="cad"><b>Mặt bằng CAD</b><small>5 tầng · đen trắng, tỉ lệ 1:75</small></button><button class="vwb" data-vw="3d"><b>Mô hình 3D</b><small>Xoay, tách tầng, xem bên trong</small></button></div></div>`}
+  return `<div class="vwtools"><div class="eyebrow">Bản vẽ và mô hình</div><div class="vwbtns"><button class="vwb" data-vw="cad"><b>Mặt bằng CAD <kbd>Ctrl+2</kbd></b><small>5 tầng · đen trắng, tỉ lệ 1:75</small></button><button class="vwb" data-vw="3d"><b>Mô hình 3D <kbd>Ctrl+1</kbd></b><small>Xoay, tách tầng, xem bên trong</small></button></div></div>`}
 let VW=null;
+addEventListener('keydown',e=>{const key=(e.ctrlKey||e.metaKey||e.altKey)&&!e.shiftKey&&(e.key==='1'||e.key==='2')?e.key:null;if(!key)return;
+  const open=VW&&!VW.el.hidden,l=state.sel!=null?BYID.get(state.sel):null,s=l&&l.code&&SALE[l.code];
+  if(!open&&!(s&&s.type==='xe_khe'))return;e.preventDefault();
+  const tab=key==='1'?'3d':'cad';if(open)vwTab(tab);else vwOpen(l,s,tab)},true);
 function vwOpen(l,s,tab){
   if(!VW){const o=document.createElement('div');o.className='vw';o.hidden=true;o.setAttribute('role','dialog');o.setAttribute('aria-modal','true');o.setAttribute('aria-label','Bản vẽ và mô hình 3D');
     o.innerHTML=`<div class="vwp"><div class="vwh"><div><div class="eyebrow" id="vw-sub"></div><b id="vw-t"></b></div><div class="vwtabs"><button id="vt-cad">Mặt bằng CAD</button><button id="vt-3d">Mô hình 3D</button></div><button class="vwx" aria-label="Đóng">✕</button></div><div class="vwbody"><div id="vw-cad" class="vwpane"></div><div id="vw-3d" class="vwpane"></div></div></div>`;
