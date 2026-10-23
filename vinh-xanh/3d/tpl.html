@@ -42,11 +42,68 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 <div id="view" role="img" aria-label="Mô hình 3D năm tầng của căn VX2-87, kéo để xoay"><div class="hint">Kéo để xoay · cuộn hoặc chụm để phóng to</div></div>
 <aside>
 <section><h2>Tầng</h2><div id="fl" class="fl-list"></div></section>
+<section><h2>Tường</h2><div class="row"><button data-w="full" aria-pressed="true">Đầy đủ</button><button data-w="low">Hạ thấp</button><button data-w="off">Ẩn tường</button></div><label class="fl"><input type="checkbox" id="fu" checked> Nội thất</label></section>
 <section><h2>Tách tầng</h2><input type="range" id="ex" min="0" max="5" step="0.1" value="0" aria-label="Khoảng tách giữa các tầng"><div class="row"><label class="fl"><input type="checkbox" id="rf" checked> Mái</label><label class="fl"><input type="checkbox" id="gl" checked> Kính mặt tiền</label></div></section>
 <section><h2>Góc nhìn</h2><div class="row"><button data-v="front">Mặt tiền</button><button data-v="corner" aria-pressed="true">Góc chéo</button><button data-v="side">Bên hông</button><button data-v="top">Từ trên</button></div><div class="row"><button id="spin" aria-pressed="false">Tự xoay</button></div></section>
-<p class="note">Dựng từ tường và cột của mẫu liền kề LK1 (đất 5 × 18 m), chưa có bản vẽ riêng cho căn xẻ khe 7 × 18 m. Mô hình minh họa, chưa có cầu thang, cửa và nội thất.</p>
+<p class="note">Dựng từ tường và cột của mẫu liền kề LK1 (đất 5 × 18 m), chưa có bản vẽ riêng cho căn xẻ khe 7 × 18 m. Nội thất và cầu thang là khối minh họa theo bản vẽ mẫu, chưa có cửa đi.</p>
 </aside></div></div>
 <script>
+/* Nội thất khối đơn giản cho từng tầng. Toạ độ theo mét trên mặt bằng: x ngang (0..5), y từ phía sau (0) ra mặt tiền (14,6).
+   Vị trí đo từ bản vẽ mẫu LK1. Trả về nhóm đặt ở độ cao sàn của tầng. */
+function buildFurniture(THREE,k,W,DP){
+  const g=new THREE.Group(),cache={};
+  const mat=c=>cache[c]||(cache[c]=new THREE.MeshStandardMaterial({color:c,roughness:.85}));
+  const C={wood:0xb98a58,dark:0x4a4540,sofa:0x8f98a3,fabric:0xd9d3c6,white:0xf4f2ee,steel:0xaab2b8,green:0x6f9a62,blue:0x6d8fa8,tv:0x1e2023,rug:0xc9bba4,bed:0xe9e4da,pillow:0xffffff,tile:0xdfe6e8};
+  const P=(x,y)=>[x-W/2,-(y-DP/2)];
+  const box=(x,y,w,d,h,c,e)=>{e=e||0;const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat(c));const[px,pz]=P(x+w/2,y+d/2);m.position.set(px,e+h/2,pz);m.castShadow=m.receiveShadow=true;g.add(m);return m};
+  const cyl=(x,y,r,h,c,e,rot)=>{const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,20),mat(c));const[px,pz]=P(x,y);m.position.set(px,(e||0)+h/2,pz);if(rot){m.rotation.z=Math.PI/2;m.position.y=(e||0)+r}m.castShadow=true;g.add(m);return m};
+  const bed=(x,y,w,d)=>{box(x,y,w,d,.32,C.wood);box(x+.02,y+.02,w-.04,d-.04,.2,C.bed,.32);box(x+w*.45,y+.02,w*.55-.02,d-.04,.06,C.blue,.52);
+    box(x+.06,y+.1,.38,.55,.12,C.pillow,.52);box(x+.06,y+d-.65,.38,.55,.12,C.pillow,.52);box(x-.02,y-.02,.08,d+.04,.95,C.wood)};
+  const wardrobe=(x,y,w,d)=>box(x,y,w,d,2.3,C.wood);
+  const sofa=(x,y,w,d,back)=>{box(x,y,w,d,.4,C.sofa);const t=.2;
+    if(back==='n')box(x,y,w,t,.85,C.sofa);else if(back==='s')box(x,y+d-t,w,t,.85,C.sofa);else if(back==='w')box(x,y,t,d,.85,C.sofa);else box(x+w-t,y,t,d,.85,C.sofa)};
+  const table=(x,y,w,d,h)=>{box(x,y,w,d,.05,C.wood,h-.05);[[.05,.05],[w-.1,.05],[.05,d-.1],[w-.1,d-.1]].forEach(([a,b])=>box(x+a,y+b,.05,.05,h-.05,C.dark))};
+  const chair=(x,y,s)=>{s=s||.42;box(x,y,s,s,.05,C.wood,.42);box(x+.02,y+.02,.04,.04,.42,C.dark);box(x+s-.06,y+.02,.04,.04,.42,C.dark);box(x+.02,y+s-.06,.04,.04,.42,C.dark);box(x+s-.06,y+s-.06,.04,.04,.42,C.dark)};
+  const toilet=(x,y,face)=>{box(x,y,.4,.3,.75,C.white);box(x+.03,y+.3,.34,.4,.4,C.white)};
+  const basin=(x,y,w)=>{box(x,y,w||.6,.45,.8,C.white);box(x+.05,y+.04,(w||.6)-.1,.37,.04,C.tile,.8)};
+  const stairs=(x0,y0,w,d,lenx,h,up)=>{ // thang chữ U: hai vế chạy dọc trục x, chiếu nghỉ ở cuối
+    const n=8,sw=lenx/n,rise=h/2/n;
+    for(let i=0;i<n;i++){box(x0+i*sw,y0,sw,d/2-.05,rise*(i+1),C.wood)}
+    box(x0+lenx,y0,.9,d,h/2,C.wood);
+    for(let i=0;i<n;i++){box(x0+lenx-(i+1)*sw,y0+d/2+.05,sw,d/2-.05,h/2+rise*(i+1),C.wood)}};
+  const tv=(x,y)=>{box(x,y,.35,2.4,.5,C.wood);box(x+.1,y+.3,.06,1.8,.95,C.tv,.7)};
+  const plant=(x,y,r)=>{cyl(x,y,.16,.35,C.dark);cyl(x,y,r||.28,.7,C.green,.35)};
+  if(k==='1'){
+    box(.05,.3,.62,4.7,.9,C.white);box(.05,.3,.62,4.7,.04,C.dark,.9);box(.12,3.6,.5,.9,.02,C.dark,.94);
+    table(3.2,2.1,1.35,1.8,.75);[2.2,2.95,3.7].forEach(yy=>{chair(2.78,yy);chair(4.62,yy)});
+    toilet(.15,5.55);basin(3.05,5.5,.6);
+    box(.8,5.5,.9,.04,.01,C.tile);
+    sofa(1.0,9.35,2.0,.85,'n');box(1.35,10.35,1.2,.6,.38,C.wood);box(.9,10.15,2.0,1.4,.02,C.rug,.01);
+    sofa(.55,11.55,.8,.8,'s');sofa(2.4,11.55,.8,.8,'s');tv(4.4,9.4);plant(4.5,13.4)
+  }else if(k==='2'){
+    bed(.1,1.3,2.4,2.0);box(4.6,2.1,.35,2.4,2.3,C.wood);table(3.9,.7,.9,.5,.75);chair(4.0,1.3);
+    toilet(1.5,7.75);basin(2.3,7.8,.6);
+    sofa(.1,10.3,.85,2.9,'w');sofa(.1,10.3,2.2,.85,'n');box(1.15,11.3,1.1,1.1,.4,C.wood);sofa(1.0,13.0,.8,.8,'s');sofa(2.0,13.0,.8,.8,'s');tv(4.45,10.6);
+    stairs(.6,5.7,3.3,1.9,3.0,3.3)
+  }else if(k==='3'){
+    table(1.3,1.5,1.2,1.5,.75);chair(.85,2.1);box(.05,.2,.4,2.4,1.9,C.wood);box(.1,3.2,.35,1.6,2.0,C.wood);
+    toilet(1.5,7.75);basin(2.3,7.8,.6);
+    bed(.1,11.2,2.0,1.9);box(4.55,11.0,.35,2.4,2.3,C.wood);table(3.9,13.0,.9,.5,.75);chair(4.0,12.5);
+    stairs(.6,5.7,3.3,1.9,3.0,3.3)
+  }else if(k==='4'){
+    bed(.1,1.2,2.4,1.9);box(4.6,.9,.3,1.6,2.3,C.wood);
+    toilet(1.2,5.2);basin(2.3,5.2,.6);
+    toilet(1.5,7.75);basin(2.3,7.8,.6);
+    bed(.1,11.2,2.0,1.9);box(4.55,11.0,.35,2.4,2.3,C.wood);table(3.9,13.0,.9,.5,.75);chair(4.0,12.5);
+    stairs(.6,5.7,3.3,1.9,3.0,3.3)
+  }else{
+    cyl(1.1,.8,.5,1.1,C.steel,.15,true);cyl(3.2,.8,.5,1.1,C.steel,.15,true);box(.15,2.0,.8,.8,.6,C.steel);
+    box(.1,8.2,.5,.55,.9,C.white);basin(4.1,7.8,.6);table(1.5,9.4,1.2,.7,.75);chair(1.8,10.2);
+    plant(.5,13.9);plant(1.8,13.9);plant(3.2,13.9);plant(4.5,13.9);
+    stairs(.6,5.7,3.3,1.9,3.0,3.0)
+  }
+  return g}
+
 const D=__DATA__;
 const FL=[['1','Tầng 1',3.6,72.9],['2','Tầng 2',3.3,72.8],['3','Tầng 3',3.3,78.4],['4','Tầng 4',3.3,75.9],['TUM','Tầng tum',3.0,59.0]];
 const SC={'1':68.9,'2':68.8,'3':74.1,'4':71.7,'TUM':55.6};
@@ -72,21 +129,24 @@ function paint(){const c=n=>new THREE.Color(css(n));
   mats.glass=mats.glass||new THREE.MeshPhysicalMaterial({transparent:true,opacity:.38,roughness:.1,side:THREE.DoubleSide,depthWrite:false});mats.glass.color=c('--glass')}
 paint();
 const groups=[];let base=0;
+const mkSlab=k=>{const w=W+.3,d=DP+.3,sh=new THREE.Shape([new THREE.Vector2(-w/2,-d/2),new THREE.Vector2(w/2,-d/2),new THREE.Vector2(w/2,d/2),new THREE.Vector2(-w/2,d/2)]);
+  if(['3','4','TUM'].includes(k)){const a=[.6,5.7],b=[4.5,7.6],q=(x,y)=>new THREE.Vector2(x-W/2,y-DP/2);sh.holes.push(new THREE.Path([q(a[0],a[1]),q(b[0],a[1]),q(b[0],b[1]),q(a[0],b[1])]))}
+  const geo=new THREE.ExtrudeGeometry(sh,{depth:SLAB,bevelEnabled:false});geo.rotateX(-Math.PI/2);geo.translate(0,-SLAB,0);const m=new THREE.Mesh(geo,mats.slab);m.castShadow=m.receiveShadow=true;return m};
 const house=new THREE.Group();scene.add(house);
 FL.forEach(([k,name,h],i)=>{
   const d=D[k],g=new THREE.Group();g.position.y=base;
-  d.shapes.forEach(s=>{
+  const wg=new THREE.Group();g.add(wg);d.shapes.forEach(s=>{
     const pt=p=>new THREE.Vector2(p[0]-W/2,p[1]-DP/2);
     const sh=new THREE.Shape(s.o.map(pt));s.h.forEach(hh=>sh.holes.push(new THREE.Path(hh.map(pt))));
     const geo=new THREE.ExtrudeGeometry(sh,{depth:h,bevelEnabled:false});geo.rotateX(-Math.PI/2);
-    const m=new THREE.Mesh(geo,mats.wall);m.castShadow=m.receiveShadow=true;g.add(m);
-    g.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo,35),mats.edge));
+    const m=new THREE.Mesh(geo,mats.wall);m.castShadow=m.receiveShadow=true;wg.add(m);
+    wg.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo,35),mats.edge));
   });
-  const slab=new THREE.Mesh(new THREE.BoxGeometry(W+.3,SLAB,DP+.3),mats.slab);slab.position.set(0,-SLAB/2,0);slab.castShadow=slab.receiveShadow=true;g.add(slab);
+  const slab=mkSlab(k);g.add(slab);const fu=buildFurniture(THREE,k,W,DP);g.add(fu);
   const gz=new THREE.Group();gz.userData.glass=1;
   [[-(d.size[1]-DP/2-.06)],[-(0-DP/2+.06)]].forEach(([z])=>{const p=new THREE.Mesh(new THREE.BoxGeometry(W-.35,h*.72,.03),mats.glass);p.position.set(0,h*.12+h*.36,z);gz.add(p)});
   g.add(gz);
-  house.add(g);groups.push({k,g,h,i,base,glass:gz});base+=h+SLAB;
+  house.add(g);groups.push({k,g,h,i,base,glass:gz,wg,fu});base+=h+SLAB;
 });
 const TOP=base;
 const roof=new THREE.Mesh(new THREE.BoxGeometry(W+.7,.2,DP+.7),mats.slab);roof.position.set(0,TOP+.1-SLAB,0);roof.castShadow=true;house.add(roof);
@@ -99,7 +159,12 @@ flEl.style.display='flex';flEl.style.flexDirection='column';flEl.style.gap='6px'
 const ex=document.getElementById('ex');function layout(){groups.forEach(o=>o.g.position.y=o.base+o.i*(+ex.value));roof.position.y=TOP+.1-SLAB+4*(+ex.value)+(+ex.value?0:0)}
 ex.oninput=layout;
 document.getElementById('rf').onchange=e=>{roof.visible=e.target.checked};
-document.getElementById('gl').onchange=e=>{groups.forEach(o=>o.glass.visible=e.target.checked)};
+document.getElementById('gl').onchange=()=>applyW();
+
+let wmode='full';
+const applyW=()=>{groups.forEach(o=>{o.wg.visible=wmode!=='off';o.wg.scale.y=wmode==='low'?1.1/o.h:1;o.glass.visible=wmode==='full'&&document.getElementById('gl').checked});roof.visible=document.getElementById('rf').checked};
+document.querySelectorAll('[data-w]').forEach(b=>b.onclick=()=>{wmode=b.dataset.w;document.querySelectorAll('[data-w]').forEach(x=>x.setAttribute('aria-pressed',x===b));document.getElementById('rf').checked=wmode==='full';applyW()});
+document.getElementById('fu').onchange=e=>groups.forEach(o=>o.fu.visible=e.target.checked);
 const V={front:[0,TOP*.5,-TOP*2.7],corner:[TOP*1.15,TOP*.8,-TOP*2.1],side:[TOP*2.7,TOP*.5,0],top:[.01,TOP*3.1,.01]};
 let tween=null;
 function go(n){const to=new THREE.Vector3(...V[n]);const from=cam.position.clone(),t0=performance.now();tween=t=>{const u=Math.min(1,(t-t0)/600),e=u*u*(3-2*u);cam.position.lerpVectors(from,to,e);if(u>=1)tween=null}}
